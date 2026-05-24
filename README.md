@@ -1,1 +1,21 @@
-# intertextuality-huinanzi
+# Intertextuality — Huainanzi 淮南子
+
+A modular React + TypeScript reader for the Huainanzi alongside its intertextual parallels in eight other classical Chinese texts (Lǎozǐ, Zhuāngzǐ, Lǚshì Chūnqiū, Wénzǐ, Guǎnzǐ, Hánfēizǐ, Shānhǎijīng, Shǐjì).
+
+Built from a Stitch design system ("Scholarly Minimalist"), with three strict layers — data, logic, and design — that can each be swapped independently. See [ARCHITECTURE.md](./ARCHITECTURE.md) and [DESIGN_AUDIT.md](./DESIGN_AUDIT.md).
+
+## Run
+
+```bash
+npm install
+npm run dev    # http://localhost:5173
+npm run build  # production bundle in dist/
+```
+
+## What's where
+
+- `src/design/` — token system (single source of visual truth)
+- `src/repositories/`, `src/adapters/`, `src/data/` — data layer (swap an adapter to point at a real API)
+- `src/context/`, `src/hooks/` — UI state + business logic
+- `src/components/` — pure renderers, organised by feature
+- `stitch-design/` — downloaded Stitch screens + HTML for visual reference

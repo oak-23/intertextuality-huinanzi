@@ -1,0 +1,288 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Scholaris - Parallel Reading</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Noto+Serif+SC:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1a1c1d",
+                      "primary-container": "#1d1d1f",
+                      "inverse-primary": "#c8c6c8",
+                      "secondary-fixed": "#e3e2e7",
+                      "on-tertiary-container": "#2d83f6",
+                      "surface-container-low": "#f3f3f5",
+                      "outline-variant": "#c7c6ca",
+                      "primary": "#030304",
+                      "secondary-container": "#e0dfe4",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#e8e8ea",
+                      "surface-bright": "#f9f9fb",
+                      "surface-tint": "#5f5e60",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e2e2e4",
+                      "surface": "#f9f9fb",
+                      "outline": "#77767b",
+                      "on-secondary-fixed-variant": "#46464b",
+                      "surface-container-highest": "#e2e2e4",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#46464a",
+                      "on-background": "#1a1c1d",
+                      "tertiary-fixed-dim": "#abc7ff",
+                      "secondary-fixed-dim": "#c7c6cb",
+                      "on-primary-fixed": "#1b1b1d",
+                      "on-primary-fixed-variant": "#474649",
+                      "on-tertiary-fixed": "#001b3f",
+                      "on-primary-container": "#868587",
+                      "on-secondary": "#ffffff",
+                      "inverse-on-surface": "#f0f0f2",
+                      "background": "#f9f9fb",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#626267",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#001c42",
+                      "surface-dim": "#d9dadc",
+                      "primary-fixed-dim": "#c8c6c8",
+                      "surface-container": "#eeeef0",
+                      "primary-fixed": "#e4e2e4",
+                      "secondary": "#5e5e63",
+                      "on-tertiary-fixed-variant": "#00458f",
+                      "tertiary": "#00030c",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#1a1b1f",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#d7e2ff",
+                      "inverse-surface": "#2f3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "reading-column-max": "720px",
+                      "top-bar-height": "56px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Noto Serif SC"
+                      ],
+                      "ui-small": [
+                              "Inter"
+                      ],
+                      "body-reading-mobile": [
+                              "Noto Serif SC"
+                      ],
+                      "label-ui": [
+                              "Inter"
+                      ],
+                      "label-caption": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Noto Serif SC"
+                      ],
+                      "body-reading": [
+                              "Noto Serif SC"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "ui-small": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-reading-mobile": [
+                              "17px",
+                              {
+                                      "lineHeight": "1.8",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-ui": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-caption": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-reading": [
+                              "18px",
+                              {
+                                      "lineHeight": "2.0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .parallel-highlight {
+            background-color: #FDDCD5;
+            transition: background-color 0.3s ease;
+        }
+        .parallel-highlight:hover {
+            background-color: #fcc2b3;
+            cursor: pointer;
+        }
+        .right-panel-shadow {
+            box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-reading flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface-bright dark:bg-primary-container fixed top-0 w-full h-[56px] border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center px-4 md:px-margin-desktop z-50">
+<div class="flex items-center gap-4 flex-1">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="menu">menu</span>
+<span class="text-headline-md font-headline-md text-on-surface dark:text-on-background">Intertextuality</span>
+</div>
+<div class="flex-1 max-w-md mx-8 hidden md:block">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" data-icon="search">search</span>
+<input class="w-full h-[36px] pl-9 pr-4 bg-surface-container-low border border-outline-variant rounded-lg text-ui-small font-ui-small text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-on-tertiary-container focus:ring-1 focus:ring-on-tertiary-container transition-colors" placeholder="Search texts..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-2 flex-1 justify-end">
+<button class="w-[36px] h-[36px] rounded-full flex items-center justify-center hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-colors scale-95 active:bg-surface-container-highest transition-transform group text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="swap_horiz">swap_horiz</span>
+</button>
+<button class="w-[36px] h-[36px] rounded-full flex items-center justify-center hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-colors scale-95 active:bg-surface-container-highest transition-transform group text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button><div class="flex items-center bg-surface-container-high rounded-full p-1 ml-2 mr-2"><button class="px-4 py-1.5 rounded-full bg-[#2d83f6] text-white transition-all shadow-sm text-label-ui font-label-ui">Rhyme</button><button class="px-4 py-1.5 rounded-full text-on-surface-variant hover:text-on-surface transition-all text-label-ui font-label-ui">Prose</button></div>
+<button class="w-[36px] h-[36px] rounded-full flex items-center justify-center hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-colors scale-95 active:bg-surface-container-highest transition-transform group text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+<button class="w-[36px] h-[36px] rounded-full flex items-center justify-center hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-colors scale-95 active:bg-surface-container-highest transition-transform group text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="w-[36px] h-[36px] rounded-full flex items-center justify-center hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-colors scale-95 active:bg-surface-container-highest transition-transform group text-on-surface-variant hidden md:flex">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+</button>
+<button class="ml-2 h-[36px] px-4 rounded-lg bg-surface-container border border-outline-variant text-label-ui font-label-ui text-on-surface hover:bg-surface-container-high transition-colors hidden sm:block">
+                Login
+            </button>
+<button class="ml-2 h-[36px] px-4 rounded-lg bg-[#0071E3] text-on-primary text-label-ui font-label-ui hover:bg-on-tertiary-container/90 transition-colors hidden sm:block">
+                Annotate
+            </button>
+</div>
+</header>
+<div class="flex flex-1 pt-[56px] h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low dark:bg-primary-container fixed left-0 top-[56px] w-[280px] h-[calc(100vh-56px)] border-r border-outline-variant dark:border-outline flat no shadows flex flex-col pt-4 overflow-y-auto hidden md:flex z-40">
+<div class="px-4 mb-6">
+<h2 class="text-headline-md font-headline-md text-on-surface">Parallel Texts</h2>
+<p class="text-label-caption font-label-caption text-on-surface-variant mt-1">Compare textual variants</p>
+</div>
+<ul class="flex flex-col w-full pb-20">
+<li class=""><a class="flex items-center gap-3 bg-surface-container dark:bg-on-surface-variant/20 font-bold border-l-4 border-on-tertiary-container transition-all duration-200 ease-in-out text-on-surface py-3 px-4" href="#"><span class="w-2 h-2 rounded-full coral-dot flex-shrink-0" style="background-color: #ff7f50;"></span><span class="text-label-ui font-label-ui truncate">Lǎozǐ</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(76, 175, 80);"></span><span class="text-label-ui font-label-ui truncate">Zhuāngzǐ</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(33, 150, 243);"></span><span class="text-label-ui font-label-ui truncate">Lǚshì Chūnqiū</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(156, 39, 176);"></span><span class="text-label-ui font-label-ui truncate">Wénzǐ</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(255, 152, 0);"></span><span class="text-label-ui font-label-ui truncate">Guǎnzǐ</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(0, 150, 136);"></span><span class="text-label-ui font-label-ui truncate">Hánfēizǐ</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(233, 30, 99);"></span><span class="text-label-ui font-label-ui truncate">Shānhǎijīng</span></a></li>
+<li class=""><a class="flex items-center gap-3 text-on-surface-variant dark:text-on-surface-variant py-3 px-4 hover:bg-surface-container-high dark:hover:bg-on-surface-variant/10 transition-all duration-200 ease-in-out" href="#"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: rgb(255, 235, 59);"></span><span class="text-label-ui font-label-ui truncate">Shǐjì</span></a></li>
+</ul>
+</nav>
+<!-- Main Reading Area (Split Panel) -->
+<main class="flex-1 md:ml-[280px] flex h-full bg-surface-container-lowest">
+<!-- Left Panel (Huainanzi) -->
+<div class="flex-1 overflow-y-auto p-8 md:p-12">
+<div class="max-w-[720px] mx-auto"><div class="mb-16 text-center">
+<p class="text-label-ui font-label-ui text-on-surface-variant tracking-[0.2em] uppercase mb-4">HUAINANZI</p>
+<h1 class="text-display-lg font-display-lg text-on-surface mb-6">原道訓</h1>
+<p class="text-headline-md font-headline-md text-on-surface-variant italic font-serif">Yuandao Xun - Originating in the Way</p>
+<div class="w-12 h-[1px] bg-outline-variant mx-auto mt-8"></div>
+</div>
+<article class="text-body-reading font-body-reading text-on-surface space-y-6 relative leading-relaxed" style="line-height: 2.0; font-family: 'Noto Serif SC', serif;"><p class="relative">
+<span class="absolute -left-6 top-2 bottom-2 w-[2px] bg-[#FDDCD5] rounded-full"></span>
+<span class="bg-[#FDDCD5] rounded px-1 transition-colors hover:bg-opacity-80 cursor-pointer" title="Parallels Lăozĩ">天道者ᄉ覆天載地ᄉ廓四方ᄉ析八極ᄉ高不可際ᄉ深不可測。</span>
+</p>
+<p class="relative">
+<span class="bg-[#D2F0EE] rounded px-1 transition-colors hover:bg-opacity-80 cursor-pointer" title="Parallels Zhuāngzĩ">包裹天地ᄉ稟授無形ᄉ原流泉捛ᄉ沖而弐瘈ᄉ混混滑滑ᄉ濁而弐清。</span>
+</p>
+<p class="relative">
+<span class="absolute -left-6 top-2 bottom-2 w-[2px] bg-[#FDF0D5] rounded-full"></span>
+<span class="bg-[#FDF0D5] rounded px-1 transition-colors hover:bg-opacity-80 cursor-pointer">故植之而塞於天地ᄉ橫之而彌於四海ᄉ施之無窮ᄉ而無所朝夕。</span>
+</p>
+<p class="relative">
+                        舒之庭於六合ᄉ卷之不瘈於一握。約而能張ᄉ幽而能明ᄉ弱而能強ᄉ柔而能剛ᄉ橫四維而含陰陽ᄉ紘宧宙而章三光。
+</p></article>
+</div>
+</div>
+<!-- Right Panel (Laozi Parallel) -->
+<div class="flex-1 overflow-y-auto bg-surface-bright right-panel-shadow border-l border-outline-variant p-8 md:p-12 relative">
+<!-- Close Button for Right Panel -->
+<button class="absolute top-4 right-4 p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<div class="max-w-[720px] mx-auto"><div class="mb-16 text-center">
+<p class="text-label-ui font-label-ui text-on-surface-variant tracking-[0.2em] uppercase mb-4">LǍOZǏ</p>
+<h1 class="text-display-lg font-display-lg text-on-surface mb-6">老子</h1>
+<p class="text-headline-md font-headline-md text-on-surface-variant italic font-serif">Dao De Jing - The Way and Its Power</p>
+<div class="w-12 h-[1px] bg-outline-variant mx-auto mt-8"></div>
+</div>
+<article class="text-body-reading font-body-reading text-on-surface space-y-6 leading-relaxed" style="line-height: 2.0; font-family: 'Noto Serif SC', serif;"><p class="relative">
+<span class="bg-[#FDDCD5] rounded px-1 transition-colors hover:bg-opacity-80 cursor-pointer">有物混成ᄉ先天地生。寂兮巠兮ᄉ獨立不改ᄉ周行而不殆ᄉ可以為天下母。</span>
+</p>
+<p class="relative">
+<span class="bg-[#D5E5FD] rounded px-1 transition-colors hover:bg-opacity-80 cursor-pointer">吾不知其名ᄉ字之曰道ᄉ強為之名曰大。</span>大曰逝ᄉ逝曰遠ᄉ遠曰反。
+</p></article>
+</div>
+</div>
+</main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

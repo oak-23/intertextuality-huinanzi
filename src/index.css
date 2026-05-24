@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Tokens are written by ThemeContext on viewMode change.
+ * Defaults here mirror src/design/tokens.ts so the page renders sanely
+ * before React hydrates.
+ */
+:root {
+  --color-primary: #1a1c1d;
+  --color-primary-strong: #030304;
+  --color-secondary: #46464a;
+  --color-muted: #86868b;
+  --color-accent: #0071e3;
+  --color-accent-bright: #2d83f6;
+  --color-accent-pressed: #005ec0;
+  --color-background: #ffffff;
+  --color-surface: #f9f9fb;
+  --color-surface-low: #f3f3f5;
+  --color-surface-container: #eeeef0;
+  --color-surface-high: #e8e8ea;
+  --color-border: #c7c6ca;
+  --color-border-strong: #77767b;
+  --color-success: #34c759;
+  --color-error: #ba1a1a;
+  --color-text-primary: #1a1c1d;
+  --color-text-secondary: #46464a;
+  --color-text-muted: #86868b;
+  --color-text-inverse: #ffffff;
+
+  --color-dot-laozi: #ff7f50;
+  --color-dot-zhuangzi: #4caf50;
+  --color-dot-lushi-chunqiu: #2196f3;
+  --color-dot-wenzi: #9c27b0;
+  --color-dot-guanzi: #ff9800;
+  --color-dot-hanfeizi: #009688;
+  --color-dot-shanhaijing: #e91e63;
+  --color-dot-shiji: #ffc107;
+
+  --color-highlight-laozi: #fddcd5;
+  --color-highlight-zhuangzi: #d2f0ee;
+  --color-highlight-lushi-chunqiu: #e5d5fd;
+  --color-highlight-wenzi: #fdf0d5;
+  --color-highlight-guanzi: #d5fdd8;
+  --color-highlight-hanfeizi: #cce5e3;
+  --color-highlight-shanhaijing: #fbd9e5;
+  --color-highlight-shiji: #fff4cc;
+
+  --top-bar-height: 56px;
+  --sidebar-width: 280px;
+  --main-text-max-width: 720px;
+  --gutter: 24px;
+  --margin-desktop: 40px;
+  --margin-mobile: 16px;
+
+  --radius-sm: 4px;
+  --radius-button: 8px;
+  --radius-popover: 8px;
+  --radius-modal: 12px;
+  --radius-lg: 16px;
+  --radius-toggle: 9999px;
+
+  --shadow-popover: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  --font-zh-body: 'Noto Serif SC', serif;
+  --font-en-body: 'Noto Serif SC', serif;
+  --font-ui: 'Inter', -apple-system, system-ui, sans-serif;
+
+  --zh-body-size: 18px;
+  --zh-body-line-height: 2;
+  --en-body-size: 16px;
+  --en-body-line-height: 1.8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-bright);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Smooth-scroll target margin so jumping anchors clear the fixed top bar */
+.scroll-anchor {
+  scroll-margin-top: calc(var(--top-bar-height) + 24px);
+}
+
+/* Highlight pulse used by useHighlightPulse */
+@keyframes segment-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(45, 131, 246, 0.45); }
+  50%  { box-shadow: 0 0 0 6px rgba(45, 131, 246, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 131, 246, 0); }
+}
+.is-pulsing {
+  animation: segment-pulse 600ms ease;
+  border-radius: var(--radius-sm);
+}
+
+/* Fade-in for popovers + modals + toasts */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 150ms ease;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 200ms ease;
+}
+
+@keyframes slide-up-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.animate-slide-up-in {
+  animation: slide-up-in 200ms ease;
+}
