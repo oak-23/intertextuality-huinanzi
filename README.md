@@ -1,4 +1,4 @@
-# Intertextuality — Huainanzi 淮南子
+# Intertextuality — Huainanzi 
 
 A modular React + TypeScript reader for the Huainanzi alongside its intertextual parallels in other classical chinese texts.
 
