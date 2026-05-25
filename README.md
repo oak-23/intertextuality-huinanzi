@@ -1,6 +1,6 @@
 # Intertextuality — Huainanzi 淮南子
 
-A modular React + TypeScript reader for the Huainanzi alongside its intertextual parallels in eight other classical Chinese texts (Lǎozǐ, Zhuāngzǐ, Lǚshì Chūnqiū, Wénzǐ, Guǎnzǐ, Hánfēizǐ, Shānhǎijīng, Shǐjì).
+A modular React + TypeScript reader for the Huainanzi alongside its intertextual parallels in other classical chinese texts.
 
 Built from a Stitch design system ("Scholarly Minimalist"), with three strict layers — data, logic, and design — that can each be swapped independently. See [ARCHITECTURE.md](./ARCHITECTURE.md) and [DESIGN_AUDIT.md](./DESIGN_AUDIT.md).
 
