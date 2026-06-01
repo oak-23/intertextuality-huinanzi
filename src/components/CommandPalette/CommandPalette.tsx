@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Search, BookOpen, FileText, AlignLeft, ArrowRight, Command } from 'lucide-react';
+import { Search, BookOpen, FileText, AlignLeft, ArrowRight} from 'lucide-react';
 import { useGlobalSearch, type GlobalSearchResult } from '../../hooks/useGlobalSearch';
 import { useApp } from '../../context/AppContext';
 import { useChapterNavigation } from '../../hooks/useChapterNavigation';
