@@ -145,7 +145,7 @@ export function MainText({ className }: MainTextProps) {
         <div
           style={{
             fontFamily: state.language === 'zh' ? 'var(--font-zh-body)' : 'var(--font-en-body)',
-            fontSize: state.language === 'zh' ? 'var(--zh-body-size)' : 'var(--en-body-size)',
+            fontSize: `calc(${state.language === 'zh' ? 'var(--zh-body-size)' : 'var(--en-body-size)'} * ${state.zoomLevel})`,
             lineHeight:
               state.language === 'zh' ? 'var(--zh-body-line-height)' : 'var(--en-body-line-height)',
             color: 'var(--color-text-primary)',

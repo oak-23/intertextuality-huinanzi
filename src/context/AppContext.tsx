@@ -44,6 +44,7 @@ export interface AppState {
   annotationMode: boolean;
   auth: AuthState;
   searchState: SearchState;
+  zoomLevel: number;
 }
 
 export type AppAction =
@@ -62,7 +63,8 @@ export type AppAction =
   | { type: 'SET_SEARCH_QUERY'; query: string }
   | { type: 'SET_SEARCH_SCOPE'; scope: SearchScope }
   | { type: 'SET_SEARCH_MATCHES'; matches: string[] }
-  | { type: 'SET_SEARCH_INDEX'; index: number };
+  | { type: 'SET_SEARCH_INDEX'; index: number }
+  | { type: 'SET_ZOOM_LEVEL'; zoomLevel: number };
 
 export const initialAppState: AppState = {
   language: 'zh',
@@ -76,6 +78,7 @@ export const initialAppState: AppState = {
   annotationMode: false,
   auth: { loggedIn: false, email: null },
   searchState: { query: '', scope: 'main', matches: [], currentIndex: 0 },
+  zoomLevel: 1,
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -123,6 +126,8 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, searchState: { ...state.searchState, matches: action.matches, currentIndex: 0 } };
     case 'SET_SEARCH_INDEX':
       return { ...state, searchState: { ...state.searchState, currentIndex: action.index } };
+    case 'SET_ZOOM_LEVEL':
+      return { ...state, zoomLevel: action.zoomLevel };
     default:
       return state;
   }
@@ -143,6 +148,7 @@ export interface AppContextValue {
   toggleSwapPanels: () => void;
   toggleAnnotationMode: () => void;
   setAuth: (auth: AuthState) => void;
+  setZoomLevel: (zoomLevel: number) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -169,6 +175,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
   const toggleSwapPanels = useCallback(() => dispatch({ type: 'TOGGLE_SWAP_PANELS' }), []);
   const toggleAnnotationMode = useCallback(() => dispatch({ type: 'TOGGLE_ANNOTATION_MODE' }), []);
   const setAuth = useCallback((auth: AuthState) => dispatch({ type: 'SET_AUTH', auth }), []);
+  const setZoomLevel = useCallback((zoomLevel: number) => dispatch({ type: 'SET_ZOOM_LEVEL', zoomLevel }), []);
 
   const value = useMemo<AppContextValue>(
     () => ({
@@ -185,6 +192,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       toggleSwapPanels,
       toggleAnnotationMode,
       setAuth,
+      setZoomLevel,
     }),
     [
       state,
@@ -199,6 +207,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       toggleSwapPanels,
       toggleAnnotationMode,
       setAuth,
+      setZoomLevel,
     ]
   );
 

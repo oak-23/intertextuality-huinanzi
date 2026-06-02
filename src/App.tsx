@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar/Sidebar';
 import { MainText } from './components/MainText/MainText';
 import { ParallelPanel } from './components/ParallelPanel/ParallelPanel';
 import { CommandPalette } from './components/CommandPalette/CommandPalette';
+import { ZoomControl } from './components/ZoomControl/ZoomControl';
 
 export function App() {
   const { state, closeParallel } = useApp();
@@ -70,6 +71,7 @@ export function App() {
         </div>
         <ParallelPanel />
       </div>
+      <ZoomControl />
       <CommandPalette open={paletteOpen} onClose={closePalette} />
     </div>
   );
