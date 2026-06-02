@@ -12,6 +12,7 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
     <IconButton
       aria-label={state.sidebarOpen ? 'Close parallel-texts sidebar' : 'Open parallel-texts sidebar'}
       aria-pressed={state.sidebarOpen}
+      active={state.sidebarOpen}
       onClick={toggleSidebar}
       className={className}
     >
