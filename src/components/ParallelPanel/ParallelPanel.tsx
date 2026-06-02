@@ -10,7 +10,7 @@ export interface ParallelPanelProps {
 }
 
 export function ParallelPanel({ className }: ParallelPanelProps) {
-  const { state, closeParallel } = useApp();
+  const { state, closeParallel, selectSegment, openParallel } = useApp();
   const { texts } = useRepositories();
   const containerRef = useRef<HTMLDivElement>(null);
   const matchRef = useRef<HTMLDivElement>(null);
@@ -19,20 +19,22 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   const text = panel ? texts.getParallelText(panel.textId) : null;
   const chapter = panel ? texts.getParallelChapter(panel.textId, panel.chapterId) : null;
 
-  // All segments in this parallel chapter that the active Huainanzi chapter references.
-  const referencedSegmentIds = useMemo(() => {
-    if (!panel) return new Set<string>();
-    const ids = new Set<string>();
+  // Map from parallel segment ID to an array of main text segment IDs
+  const parallelToMainMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    if (!panel) return map;
     const activeMain = texts.getChapter(state.activeChapterId);
-    if (!activeMain) return ids;
+    if (!activeMain) return map;
     for (const seg of activeMain.segments) {
       for (const p of seg.parallels) {
         if (p.textId === panel.textId && p.chapterId === panel.chapterId) {
-          ids.add(p.segmentId);
+          const mainIds = map.get(p.segmentId) || [];
+          mainIds.push(seg.id);
+          map.set(p.segmentId, mainIds);
         }
       }
     }
-    return ids;
+    return map;
   }, [panel, state.activeChapterId, texts]);
 
   useEffect(() => {
@@ -130,13 +132,23 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
           >
             {chapter.segments.map((seg) => {
               const isPrimary = seg.id === panel.segmentId;
-              const isReferenced = referencedSegmentIds.has(seg.id);
+              const mainIds = parallelToMainMap.get(seg.id);
+              const isReferenced = mainIds && mainIds.length > 0;
               const showHighlight = isPrimary || isReferenced;
               const colorKey = (text.colorKey ?? 'laozi') as ColorKey;
+              
+              const handleClick = () => {
+                if (isReferenced) {
+                  openParallel({ ...panel, segmentId: seg.id });
+                  selectSegment(mainIds[0]);
+                }
+              };
+
               return (
                 <p
                   key={seg.id}
                   ref={isPrimary ? matchRef : undefined}
+                  onClick={handleClick}
                   style={{
                     marginBottom: 16,
                     padding: showHighlight ? '6px 8px' : '4px 0',
@@ -146,6 +158,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                     outline: isPrimary ? '2px solid var(--color-accent-bright)' : 'none',
                     outlineOffset: 1,
                     borderRadius: 'var(--radius-sm)',
+                    cursor: isReferenced ? 'pointer' : 'default',
                   }}
                   className={state.language === 'zh' ? 'font-serif' : 'font-serif italic'}
                 >

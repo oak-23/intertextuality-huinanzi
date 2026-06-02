@@ -108,7 +108,6 @@ function reducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         parallelPanel: action.panel,
-        selectedSegmentId: action.panel.segmentId,
       };
     case 'CLOSE_PARALLEL':
       return { ...state, parallelPanel: null, panelsSwapped: false };
