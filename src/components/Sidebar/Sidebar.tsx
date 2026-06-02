@@ -6,7 +6,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const { state, toggleSidebar } = useApp();
+  const { state } = useApp();
   return (
     <nav
       aria-label="Parallel texts"
