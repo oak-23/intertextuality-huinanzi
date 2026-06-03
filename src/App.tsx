@@ -1,12 +1,31 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useApp } from './context/AppContext';
 import { TopBar } from './components/TopBar/TopBar';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { MainText } from './components/MainText/MainText';
 import { ParallelPanel } from './components/ParallelPanel/ParallelPanel';
+import { CommandPalette } from './components/CommandPalette/CommandPalette';
+import { ZoomControl } from './components/ZoomControl/ZoomControl';
 
 export function App() {
   const { state, closeParallel } = useApp();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  const openPalette = useCallback(() => setPaletteOpen(true), []);
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
+
+  // Global ⌘K / Ctrl+K handler to open the command palette.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+        return;
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   // Global Escape handler: close the parallel panel if nothing else has taken it.
   // Modals/popovers handle Escape themselves and stop propagation.
@@ -27,7 +46,7 @@ export function App() {
       className="flex flex-col h-screen overflow-hidden"
       style={{ backgroundColor: 'var(--color-background)' }}
     >
-      <TopBar />
+      <TopBar onSearchClick={openPalette} />
       <Sidebar />
       <div
         style={{
@@ -52,6 +71,8 @@ export function App() {
         </div>
         <ParallelPanel />
       </div>
+      <ZoomControl />
+      <CommandPalette open={paletteOpen} onClose={closePalette} />
     </div>
   );
 }
