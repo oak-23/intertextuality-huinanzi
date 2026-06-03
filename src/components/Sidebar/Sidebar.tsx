@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ParallelList } from './ParallelList';
 
@@ -7,7 +6,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const { state, toggleSidebar } = useApp();
+  const { state } = useApp();
   return (
     <nav
       aria-label="Parallel texts"
@@ -52,20 +51,7 @@ export function Sidebar({ className }: SidebarProps) {
             Compare textual variants
           </p>
         </div>
-        <button
-          type="button"
-          aria-label="Close sidebar"
-          onClick={toggleSidebar}
-          className="inline-flex items-center justify-center rounded-full hover:bg-surface-high transition-colors"
-          style={{
-            width: 28,
-            height: 28,
-            color: 'var(--color-secondary)',
-            marginTop: 2,
-          }}
-        >
-          <X size={16} />
-        </button>
+
       </div>
       <ParallelList />
     </nav>
