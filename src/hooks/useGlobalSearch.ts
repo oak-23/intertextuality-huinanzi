@@ -34,40 +34,40 @@ export function useGlobalSearch() {
 
   const index = useMemo(() => {
     const entries: GlobalSearchResult[] = [];
-    const mainText = texts.getMainText();
+    const mainText = texts.getMainContinuousText();
 
-    // Main text
-    entries.push({
-      kind: 'text',
-      label: mainText.title.zh,
-      sublabel: mainText.title.en,
-      textId: mainText.id,
-      chapterId: mainText.chapters[0]?.id ?? '',
-      isMain: true,
-    });
-
-    // Main chapters
-    for (const chapter of mainText.chapters) {
+    if (mainText) {
+      // Main text
       entries.push({
-        kind: 'chapter',
-        label: chapter.title.zh,
-        sublabel: `${mainText.title.en} · ${chapter.title.en}`,
+        kind: 'text',
+        label: mainText.title.zh,
+        sublabel: mainText.title.en,
         textId: mainText.id,
-        chapterId: chapter.id,
+        chapterId: mainText.chapters[0]?.id ?? '',
         isMain: true,
       });
 
-      // Main segments
-      for (const seg of chapter.segments) {
+      // Main chapters
+      for (const chapter of mainText.chapters) {
         entries.push({
-          kind: 'segment',
-          label: seg.content.zh.slice(0, 60) + (seg.content.zh.length > 60 ? '…' : ''),
-          sublabel: seg.content.en.slice(0, 80) + (seg.content.en.length > 80 ? '…' : ''),
+          kind: 'chapter',
+          label: chapter.title.zh,
+          sublabel: `${mainText.title.en} · ${chapter.title.en}`,
           textId: mainText.id,
           chapterId: chapter.id,
-          segmentId: seg.id,
           isMain: true,
-          excerpt: language === 'zh' ? seg.content.zh : seg.content.en,
+        });
+
+        // Add the whole chapter text as a single searchable 'segment' for search indexing purposes
+        entries.push({
+          kind: 'segment',
+          label: chapter.text.zh.slice(0, 60) + (chapter.text.zh.length > 60 ? '…' : ''),
+          sublabel: chapter.text.en.slice(0, 80) + (chapter.text.en.length > 80 ? '…' : ''),
+          textId: mainText.id,
+          chapterId: chapter.id,
+          segmentId: '', // Continuous text has no segment IDs
+          isMain: true,
+          excerpt: language === 'zh' ? chapter.text.zh : chapter.text.en,
         });
       }
     }
