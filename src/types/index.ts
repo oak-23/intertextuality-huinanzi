@@ -42,6 +42,38 @@ export interface Chapter {
   segments: Segment[];
 }
 
+/** A highlighted span within continuous text that references a parallel */
+export interface InlineParallel {
+  /** Character index range in the Chinese text */
+  startZh: number;
+  endZh: number;
+  /** Character index range in the English text */
+  startEn: number;
+  endEn: number;
+  /** The parallel reference */
+  textId: string;
+  chapterId: string;
+  segmentId: string;
+  colorKey: ColorKey;
+}
+
+/** A chapter with continuous (unsegmented) text */
+export interface ContinuousChapter {
+  id: string;
+  title: BiLingual;
+  /** Full continuous text of the chapter */
+  text: BiLingual;
+  /** Inline highlight ranges referencing parallels */
+  inlineParallels: InlineParallel[];
+}
+
+/** A text with continuous (unsegmented) chapters */
+export interface ContinuousText {
+  id: string;
+  title: BiLingual;
+  chapters: ContinuousChapter[];
+}
+
 export interface Text {
   id: string;
   title: BiLingual;

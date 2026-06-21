@@ -38,18 +38,18 @@
   --color-dot-shanhaijing: #e91e63;
   --color-dot-shiji: #ffc107;
 
-  --color-highlight-laozi: #fddcd5;
-  --color-highlight-zhuangzi: #d2f0ee;
-  --color-highlight-lushi-chunqiu: #e5d5fd;
-  --color-highlight-wenzi: #fdf0d5;
-  --color-highlight-guanzi: #d5fdd8;
-  --color-highlight-hanfeizi: #cce5e3;
-  --color-highlight-shanhaijing: #fbd9e5;
-  --color-highlight-shiji: #fff4cc;
+  --color-highlight-laozi: #ffccb9;
+  --color-highlight-zhuangzi: #b7dfb9;
+  --color-highlight-lushi-chunqiu: #a6d5fa;
+  --color-highlight-wenzi: #d7a8df;
+  --color-highlight-guanzi: #ffd599;
+  --color-highlight-hanfeizi: #99d5cf;
+  --color-highlight-shanhaijing: #f6a5c0;
+  --color-highlight-shiji: #ffe69b;
 
   --top-bar-height: 56px;
   --sidebar-width: 280px;
-  --main-text-max-width: 720px;
+  --main-text-max-width: 840px;
   --gutter: 24px;
   --margin-desktop: 40px;
   --margin-mobile: 16px;
@@ -119,13 +119,15 @@ textarea {
 
 /* Highlight pulse used by useHighlightPulse */
 @keyframes segment-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(45, 131, 246, 0.45); }
-  50%  { box-shadow: 0 0 0 6px rgba(45, 131, 246, 0.15); }
-  100% { box-shadow: 0 0 0 0 rgba(45, 131, 246, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.8); }
+  50%  { box-shadow: 0 0 0 12px rgba(0, 113, 227, 0.4); }
+  100% { box-shadow: 0 0 0 4px rgba(0, 113, 227, 0); }
 }
 .is-pulsing {
-  animation: segment-pulse 600ms ease;
+  animation: segment-pulse 1200ms ease-out;
   border-radius: var(--radius-sm);
+  position: relative;
+  z-index: 10;
 }
 
 /* Fade-in for popovers + modals + toasts */
