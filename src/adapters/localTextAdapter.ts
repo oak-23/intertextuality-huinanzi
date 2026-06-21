@@ -1,15 +1,19 @@
 import { sampleContinuousMainText, sampleParallelTexts } from '../data/newData';
+import { sampleMainText } from '../data/sampleData';
 import type { ITextRepository } from '../repositories/types';
 import type { Chapter, ContinuousChapter, ContinuousText, Language, SearchResult, SearchScope, Segment, Text } from '../types';
 
 export class LocalTextAdapter implements ITextRepository {
+  private readonly main: Text = sampleMainText;
   private readonly continuous: ContinuousText = sampleContinuousMainText;
   private readonly parallels: Text[] = sampleParallelTexts;
   private readonly parallelsById: Map<string, Text> = new Map(
     sampleParallelTexts.map((t) => [t.id, t])
   );
 
-
+  getMainText(): Text {
+    return this.main;
+  }
 
   getMainContinuousText(): ContinuousText | null {
     return this.continuous;
@@ -34,7 +38,7 @@ export class LocalTextAdapter implements ITextRepository {
   }
 
   getSegment(textId: string, chapterId: string, segmentId: string): Segment | null {
-    const text = this.getParallelText(textId);
+    const text = textId === this.main.id ? this.main : this.getParallelText(textId);
     if (!text) return null;
     const chapter = text.chapters.find((c) => c.id === chapterId);
     if (!chapter) return null;
