@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useRepositories } from '../../context/RepositoryContext';
-import type { ColorKey } from '../../types';
 // ParallelPanel reads token-defined CSS vars only — no hardcoded hex.
 
 export interface ParallelPanelProps {
@@ -10,36 +9,29 @@ export interface ParallelPanelProps {
 }
 
 export function ParallelPanel({ className }: ParallelPanelProps) {
-  const { state, closeParallel, selectSegment, openParallel } = useApp();
+  const { state, closeParallel } = useApp();
   const { texts } = useRepositories();
   const containerRef = useRef<HTMLDivElement>(null);
-  const matchRef = useRef<HTMLDivElement>(null);
 
   const panel = state.parallelPanel;
   const text = panel ? texts.getParallelText(panel.textId) : null;
-  const chapter = panel ? texts.getParallelChapter(panel.textId, panel.chapterId) : null;
+  const segment = panel ? texts.getSegment(panel.textId, panel.chapterId, panel.segmentId) : null;
 
-  // Map from parallel segment ID to an array of main text segment IDs
-  const parallelToMainMap = useMemo(() => {
-    const map = new Map<string, string[]>();
-    if (!panel) return map;
-    const activeMain = texts.getChapter(state.activeChapterId);
-    if (!activeMain) return map;
-    for (const seg of activeMain.segments) {
-      for (const p of seg.parallels) {
-        if (p.textId === panel.textId && p.chapterId === panel.chapterId) {
-          const mainIds = map.get(p.segmentId) || [];
-          mainIds.push(seg.id);
-          map.set(p.segmentId, mainIds);
-        }
-      }
+  const handleScrollToMainText = () => {
+    if (!segment) return;
+    const target = document.querySelector(`[data-parallel-ids~="${segment.id}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.add('is-pulsing');
+      setTimeout(() => {
+        target.classList.remove('is-pulsing');
+      }, 1200);
     }
-    return map;
-  }, [panel, state.activeChapterId, texts]);
+  };
 
   useEffect(() => {
-    if (panel && matchRef.current) {
-      matchRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (panel && containerRef.current) {
+      containerRef.current.scrollTop = 0;
     }
   }, [panel]);
 
@@ -60,7 +52,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
         flexShrink: 0,
       }}
     >
-      {panel && text && chapter && (
+      {panel && text && segment && (
         <div
           className="mx-auto"
           style={{ maxWidth: 640, padding: '64px 32px 96px', height: '100%', overflowY: 'auto' }}
@@ -101,16 +93,6 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             >
               {text.title.zh}
             </h2>
-            <p
-              className="font-serif italic"
-              style={{
-                fontSize: 18,
-                fontWeight: 500,
-                color: 'var(--color-secondary)',
-              }}
-            >
-              {chapter.title.zh} · {chapter.title.en}
-            </p>
             <div
               aria-hidden
               style={{
@@ -128,44 +110,30 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               lineHeight:
                 state.language === 'zh' ? 'var(--zh-body-line-height)' : 'var(--en-body-line-height)',
               color: 'var(--color-text-primary)',
+              cursor: 'pointer',
             }}
+            onClick={handleScrollToMainText}
+            title="Click to locate in main text"
           >
-            {chapter.segments.map((seg) => {
-              const isPrimary = seg.id === panel.segmentId;
-              const mainIds = parallelToMainMap.get(seg.id);
-              const isReferenced = mainIds && mainIds.length > 0;
-              const showHighlight = isPrimary || isReferenced;
-              const colorKey = (text.colorKey ?? 'laozi') as ColorKey;
-              
-              const handleClick = () => {
-                if (isReferenced) {
-                  openParallel({ ...panel, segmentId: seg.id });
-                  selectSegment(mainIds[0]);
-                }
-              };
-
-              return (
-                <p
-                  key={seg.id}
-                  ref={isPrimary ? matchRef : undefined}
-                  onClick={handleClick}
-                  style={{
-                    marginBottom: 16,
-                    padding: showHighlight ? '6px 8px' : '4px 0',
-                    backgroundColor: showHighlight
-                      ? `var(--color-highlight-${colorKey})`
-                      : 'transparent',
-                    outline: isPrimary ? '2px solid var(--color-accent-bright)' : 'none',
-                    outlineOffset: 1,
-                    borderRadius: 'var(--radius-sm)',
-                    cursor: isReferenced ? 'pointer' : 'default',
-                  }}
-                  className={state.language === 'zh' ? 'font-serif' : 'font-serif italic'}
-                >
-                  {state.language === 'zh' ? seg.content.zh : seg.content.en}
-                </p>
-              );
-            })}
+            <p
+              style={{
+                padding: '6px 8px',
+                backgroundColor: `var(--color-highlight-${text.colorKey ?? 'laozi'})`,
+                borderRadius: 'var(--radius-sm)',
+                outline: '2px solid var(--color-accent-bright)',
+                outlineOffset: 1,
+                transition: 'filter 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = 'brightness(0.97)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = '';
+              }}
+              className={state.language === 'zh' ? 'font-serif' : 'font-serif italic'}
+            >
+              {state.language === 'zh' ? segment.content.zh : segment.content.en}
+            </p>
           </div>
         </div>
       )}
