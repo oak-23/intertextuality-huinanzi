@@ -9,11 +9,15 @@ import type {
   Language,
   SearchScope,
   ReportPayload,
+  ContinuousChapter,
+  ContinuousText,
 } from '../types';
 
 export interface ITextRepository {
   getMainText(): Text;
+  getMainContinuousText(): ContinuousText | null;
   getChapter(chapterId: string): Chapter | null;
+  getContinuousChapter(chapterId: string): ContinuousChapter | null;
   getParallelText(textId: string): Text | null;
   getParallelChapter(textId: string, chapterId: string): Chapter | null;
   getSegment(textId: string, chapterId: string, segmentId: string): Segment | null;
