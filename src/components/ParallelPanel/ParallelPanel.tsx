@@ -17,6 +17,18 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   const text = panel ? texts.getParallelText(panel.textId) : null;
   const segment = panel ? texts.getSegment(panel.textId, panel.chapterId, panel.segmentId) : null;
 
+  const handleScrollToMainText = () => {
+    if (!segment) return;
+    const target = document.querySelector(`[data-parallel-ids~="${segment.id}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.add('is-pulsing');
+      setTimeout(() => {
+        target.classList.remove('is-pulsing');
+      }, 1200);
+    }
+  };
+
   useEffect(() => {
     if (panel && containerRef.current) {
       containerRef.current.scrollTop = 0;
@@ -98,7 +110,10 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               lineHeight:
                 state.language === 'zh' ? 'var(--zh-body-line-height)' : 'var(--en-body-line-height)',
               color: 'var(--color-text-primary)',
+              cursor: 'pointer',
             }}
+            onClick={handleScrollToMainText}
+            title="Click to locate in main text"
           >
             <p
               style={{
@@ -107,6 +122,13 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                 borderRadius: 'var(--radius-sm)',
                 outline: '2px solid var(--color-accent-bright)',
                 outlineOffset: 1,
+                transition: 'filter 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = 'brightness(0.97)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = '';
               }}
               className={state.language === 'zh' ? 'font-serif' : 'font-serif italic'}
             >
