@@ -8,6 +8,7 @@ const huainanzi: Text = {
   id: 'huainanzi',
   title: { zh: '淮南子', en: 'Huainanzi' },
   chapters: [
+    // CHAPTER 1
     {
       id: 'yuan-dao',
       title: { zh: '原道訓', en: 'Yuandao Xun — Originating in the Way' },
@@ -293,6 +294,7 @@ const huainanzi: Text = {
         },
       ],
     },
+    // CHAPTER 2
     {
       id: 'chu-zhen',
       title: { zh: '俶真訓', en: 'Chuzhen Xun — Activating the Genuine' },

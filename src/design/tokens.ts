@@ -44,10 +44,10 @@ export const tokens = {
     } as Record<ColorKey, string>,
     highlight: {
       laozi: '#FDDCD5',
-      zhuangzi: '#D2F0EE',
-      'lushi-chunqiu': '#E5D5FD',
-      wenzi: '#FDF0D5',
-      guanzi: '#D5FDD8',
+      zhuangzi: '#D5FDD8',
+      'lushi-chunqiu': '#DCEAF7',
+      wenzi: '#E5D5FD',
+      guanzi: '#FFE0B2',
       hanfeizi: '#CCE5E3',
       shanhaijing: '#FBD9E5',
       shiji: '#FFF4CC',
@@ -110,7 +110,7 @@ export const tokens = {
   spacing: {
     topBarHeight: '56px',
     sidebarWidth: '280px',
-    mainTextMaxWidth: '720px',
+    mainTextMaxWidth: '840px',
     panelGap: '0px',
     gutter: '24px',
     marginDesktop: '40px',

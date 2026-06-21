@@ -39,17 +39,17 @@
   --color-dot-shiji: #ffc107;
 
   --color-highlight-laozi: #fddcd5;
-  --color-highlight-zhuangzi: #d2f0ee;
-  --color-highlight-lushi-chunqiu: #e5d5fd;
-  --color-highlight-wenzi: #fdf0d5;
-  --color-highlight-guanzi: #d5fdd8;
+  --color-highlight-zhuangzi: #d5fdd8;
+  --color-highlight-lushi-chunqiu: #dceaf7;
+  --color-highlight-wenzi: #e5d5fd;
+  --color-highlight-guanzi: #ffe0b2;
   --color-highlight-hanfeizi: #cce5e3;
   --color-highlight-shanhaijing: #fbd9e5;
   --color-highlight-shiji: #fff4cc;
 
   --top-bar-height: 56px;
   --sidebar-width: 280px;
-  --main-text-max-width: 720px;
+  --main-text-max-width: 840px;
   --gutter: 24px;
   --margin-desktop: 40px;
   --margin-mobile: 16px;
