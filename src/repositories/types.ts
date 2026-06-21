@@ -14,6 +14,7 @@ import type {
 } from '../types';
 
 export interface ITextRepository {
+  getMainText(): Text;
   getMainContinuousText(): ContinuousText | null;
   getChapter(chapterId: string): Chapter | null;
   getContinuousChapter(chapterId: string): ContinuousChapter | null;
