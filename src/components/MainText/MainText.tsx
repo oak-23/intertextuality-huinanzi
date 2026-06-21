@@ -80,23 +80,7 @@ function splitIntoSpans(
   return spans;
 }
 
-/**
- * Compute the highlight background for a set of parallels.
- */
-function highlightBackground(parallels: InlineParallel[]): string {
-  if (parallels.length === 0) return 'transparent';
-  if (parallels.length === 1) return `var(--color-highlight-${parallels[0].colorKey})`;
-  // Multi: equal-width linear-gradient with sharp stops
-  const step = 100 / parallels.length;
-  const stops = parallels
-    .map((p, i) => {
-      const start = i * step;
-      const end = (i + 1) * step;
-      return `var(--color-highlight-${p.colorKey}) ${start}% ${end}%`;
-    })
-    .join(', ');
-  return `linear-gradient(to right, ${stops})`;
-}
+
 
 export function MainText({ className }: MainTextProps) {
   const { state, openParallel } = useApp();
@@ -229,15 +213,51 @@ export function MainText({ className }: MainTextProps) {
         >
           {spans.map((span, i) => {
             if (span.parallels.length === 0) {
-              // Plain text span
               return <span key={i}>{span.text}</span>;
             }
 
-            // Highlighted span with parallel references
-            const bg = highlightBackground(span.parallels);
+            if (span.parallels.length === 1) {
+              return (
+                <span
+                  key={i}
+                  data-parallel-ids={span.parallels[0].segmentId}
+                  className="scroll-anchor"
+                  onClick={(e) => handleHighlightClick(span.parallels, e.currentTarget)}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.filter = 'brightness(0.97)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.filter = '';
+                  }}
+                  style={{
+                    background: `var(--color-highlight-${span.parallels[0].colorKey})`,
+                    padding: '2px 4px',
+                    borderRadius: 'var(--radius-sm)',
+                    cursor: 'pointer',
+                    transition: 'filter 150ms ease, box-shadow 150ms ease',
+                    display: 'inline',
+                  }}
+                >
+                  {span.text}
+                </span>
+              );
+            }
+
+            const chars = Array.from(span.text);
+            const chunkSize = Math.max(1, Math.ceil(chars.length / span.parallels.length));
+            const chunks = [];
+            for (let j = 0; j < span.parallels.length; j++) {
+              const text = chars.slice(j * chunkSize, (j + 1) * chunkSize).join('');
+              if (text) {
+                chunks.push({ text, parallel: span.parallels[j] });
+              }
+            }
+
             return (
               <span
                 key={i}
+                data-parallel-ids={span.parallels.map((p) => p.segmentId).join(' ')}
+                className="scroll-anchor"
                 onClick={(e) => handleHighlightClick(span.parallels, e.currentTarget)}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.filter = 'brightness(0.97)';
@@ -246,15 +266,33 @@ export function MainText({ className }: MainTextProps) {
                   (e.currentTarget as HTMLElement).style.filter = '';
                 }}
                 style={{
-                  background: bg,
-                  padding: '2px 4px',
-                  borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   transition: 'filter 150ms ease, box-shadow 150ms ease',
                   display: 'inline',
                 }}
               >
-                {span.text}
+                {chunks.map((chunk, j) => (
+                  <span
+                    key={j}
+                    style={{
+                      background: `var(--color-highlight-${chunk.parallel.colorKey})`,
+                      paddingTop: 2,
+                      paddingBottom: 2,
+                      paddingLeft: j === 0 ? 4 : 0,
+                      paddingRight: j === chunks.length - 1 ? 4 : 0,
+                      borderRadius:
+                        j === 0 && j === chunks.length - 1
+                          ? 'var(--radius-sm)'
+                          : j === 0
+                          ? 'var(--radius-sm) 0 0 var(--radius-sm)'
+                          : j === chunks.length - 1
+                          ? '0 var(--radius-sm) var(--radius-sm) 0'
+                          : 0,
+                    }}
+                  >
+                    {chunk.text}
+                  </span>
+                ))}
               </span>
             );
           })}
