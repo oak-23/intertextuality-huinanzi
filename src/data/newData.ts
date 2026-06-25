@@ -172,7 +172,7 @@ const zhuangzi: Text = {
             id: 'zz-tiandi',
             title: { zh: '天地', en: 'Heaven and Earth' },
             segments: [
-                { id: 'zz-tia-01', content: { zh: '無為為之之謂天，無為言之之謂德，有萬不同之謂富。', en: '' } },
+                { id: 'zz-tia-01', content: { zh: '無為為之之謂天，無為言之之謂德，', en: '' } },
                 { id: 'zz-tia-02', content: { zh: '與物化', en: '' } },
                 { id: 'zz-tia-03', content: { zh: '至無而供其求，時騁而要其宿，大小、長短、修遠。」', en: '' } },
                 { id: 'zz-tia-04', content: { zh: '機心存於胸中，則純白不備；', en: '' } },
