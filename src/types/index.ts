@@ -12,7 +12,8 @@ export type ColorKey =
   | "hanfeizi"
   | "shanhaijing"
   | "shiji"
-  | "xunzi";
+  | "xunzi"
+  | "liji";
 
 export interface BiLingual {
   zh: string;
