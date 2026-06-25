@@ -119,6 +119,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 color: "var(--color-secondary)",
+                fontStyle: "italic",
                 marginBottom: 12,
               }}
             >
@@ -150,7 +151,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                     marginBottom: 8,
                   }}
                 >
-                  {chapter.title.en}
+                  {`"${chapter.title.en}"`}
                 </p>
                 <h3
                   className="font-serif"
