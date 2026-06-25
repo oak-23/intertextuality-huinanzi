@@ -1,13 +1,13 @@
 import { Popover } from "../shared/Popover";
-import type { InlineParallel, Language } from "../../types";
+import type { Language, ParallelOption } from "../../types";
 import { useRepositories } from "../../context/RepositoryContext";
 
 export interface MultiParallelPopoverProps {
   open: boolean;
   anchor: HTMLElement | null;
-  parallels: InlineParallel[];
+  parallels: ParallelOption[];
   language: Language;
-  onSelect: (parallel: InlineParallel) => void;
+  onSelect: (parallel: ParallelOption) => void;
   onClose: () => void;
 }
 
