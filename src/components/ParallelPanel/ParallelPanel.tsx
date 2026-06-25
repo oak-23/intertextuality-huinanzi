@@ -16,6 +16,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   const panel = state.parallelPanel;
   const text = panel ? texts.getParallelText(panel.textId) : null;
   const segment = panel ? texts.getSegment(panel.textId, panel.chapterId, panel.segmentId) : null;
+  const chapter = panel && text ? text.chapters.find((c) => c.id === panel.chapterId) : null;
 
   const handleScrollToMainText = () => {
     if (!segment) return;
@@ -87,12 +88,40 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.2,
-                marginBottom: 12,
+                marginBottom: chapter ? 16 : 12,
                 color: 'var(--color-text-primary)',
               }}
             >
               {text.title.zh}
             </h2>
+            {chapter && (
+              <>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-ui)',
+                    fontWeight: 500,
+                    fontSize: 11,
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-secondary)',
+                    marginBottom: 8,
+                  }}
+                >
+                  {chapter.title.en}
+                </p>
+                <h3
+                  className="font-serif"
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 600,
+                    letterSpacing: '-0.01em',
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  {chapter.title.zh}
+                </h3>
+              </>
+            )}
             <div
               aria-hidden
               style={{

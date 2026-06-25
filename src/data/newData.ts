@@ -1,4 +1,6 @@
 import type { Text, ColorKey, ContinuousText } from '../types';
+import { buildChapter } from './builder';
+import { chap1Data } from './chapters/chap1';
 
 /* ============================================================================
  * Huainanzi 淮南子 — main text (continuous / unsegmented format)
@@ -7,220 +9,17 @@ import type { Text, ColorKey, ContinuousText } from '../types';
  * Parallel references are encoded as character-index ranges within that string.
  * ==========================================================================*/
 
-// ── Chapter 1: 原道訓  ─────────────────────────────────────────────────────
-
-const yuanDaoZh = [
-    '夫道者，覆天載地，廓四方，柝八極，高不可際，深不可測，包裹天地，稟授無形。',
-    '原流泉浡，沖而徐盈；混混滑滑，濁而徐清。',
-    '故植之而塞於天地，橫之而彌於四海；施之無窮，而無所朝夕。',
-    '舒之幎於六合，卷之不盈於一握。',
-    '約而能張，幽而能明，弱而能強，柔而能剛。',
-    '橫四維而含陰陽，紘宇宙而章三光。',
-    '甚淖而滒，甚纖而微。',
-    '山以之高，淵以之深，獸以之走，鳥以之飛。',
-    '日月以之明，星辰以之行，麟以之游，鳳以之翔。',
-    '泰古二皇，得道之柄，立於中央，神與化游，以撫四方。',
-    '是故能天運地滯，輪轉而無廢；水流而不息，與萬物終始。',
-    '風興雲蒸，事無不應；雷聲雨降，並應無窮。',
-    '鬼出電入，龍興鸞集；鈞旋轂轉，週而復匝。',
-    '已雕已琢，還反於樸。',
-    '無為為之而合於道，無為言之而通乎德。',
-    '恬愉無矜而得於和，有萬不同而便於性。',
-    '神托於秋豪之末，而大宇宙之總，其德優天地而和陰陽。',
-    '節四時而調五行，呴諭覆育，萬物群生。',
-    '潤於草木，浸於金石，禽獸碩大，毫毛潤澤。',
-    '羽翼奮也，角觡生也；獸胎不殰，鳥卵不毈。',
-    '父無喪子之憂，兄無哭弟之哀；童子不孤，婦人不孀。',
-    '虹蜺不出，賊星不行，含德之所致也。',
-    '夫太上之道，生萬物而不有，成化像而弗宰。',
-    '跂行喙息，蠉飛蠕動，待而後生，莫之知德；待而後死，莫之能怨。',
-    '得之者不誾，失之者不譽。收聚畜積而不加富，布施稟受而不益貧。',
-    '忽兮恍兮，不可為象兮；恍兮忽兮，用不屈兮。',
-    '幽兮冥兮，應於無形兮；遂兮洞兮，不虛動兮。',
-    '與剛柔卷舒兮，與陰陽俯仰兮。',
-    '泰古二皇，得道之柄，立於中央，神與化遊，以撫四方。',
-    '是故能天運地滯，週而復匝。',
-].join('');
-
-const yuanDaoEn = [
-    'The Way covers Heaven and bears up the Earth, extends the four directions and splits the eight ultimates, so high it cannot be reached, so deep it cannot be plumbed; it embraces Heaven and Earth and bestows form upon the formless. ',
-    'Like a rising spring it surges forth, void yet gradually filling; turbid and roiling, muddy yet gradually clearing. ',
-    'Set it upright and it fills Heaven and Earth; set it crosswise and it covers the four seas. Apply it without exhaustion, and it knows no morning or evening. ',
-    'Unfurled, it wraps the six directions; rolled up, it does not fill the hand. ',
-    'Bound, it can extend; obscure, it can illuminate; weak, it can be strong; soft, it can be hard. ',
-    'It crosses the four cardinals and embraces yin and yang; it bounds the cosmos and brightens the three lights. ',
-    'So watery it pools and flows; so fine it is barely perceptible. ',
-    'Mountains by it stand high, abysses by it run deep; beasts by it run, birds by it fly. ',
-    'The sun and moon by it shine, the stars by it course; the unicorn by it roams, the phoenix by it soars. ',
-    'In high antiquity the Two August Ones grasped the handle of the Way, stood in the centre, and roamed with the spirit of transformation to soothe the four directions. ',
-    'Therefore Heaven can revolve and Earth abide, the wheel turn without halting; water flow on unceasing, beginning and ending with the myriad things. ',
-    'Wind rises, clouds gather: nothing fails to answer. Thunder peals and rain descends, responding without end. ',
-    'Ghosts appear and lightning flees; dragons rise and luan-birds flock. The potter\'s wheel spins, the axle turns, and round again it goes. ',
-    'Carved and polished, it returns to the uncarved block. ',
-    'Act on it without acting, and it accords with the Way; speak of it without speaking, and it penetrates Virtue. ',
-    'Calm, content, and unboastful, one attains harmony; though the myriad things differ, all are at ease in their nature. ',
-    'Spirit lodges at the tip of an autumn hair yet encompasses the whole cosmos; its virtue exceeds Heaven and Earth and harmonises yin and yang. ',
-    'It regulates the four seasons and tunes the five phases; sighing it nurtures, covering and rearing the myriad living things. ',
-    'It moistens the grasses and trees, soaks into metal and stone; birds and beasts grow large, their down and fur all glossy. ',
-    'Feathers and wings beat, antlers and horns grow; beasts in womb do not miscarry, eggs in shell do not addle. ',
-    'No father grieves the loss of a son, no elder brother weeps a younger; children are not orphaned, wives are not widowed. ',
-    'No rainbows of ill omen appear, no rogue stars wander — such is what the embrace of Virtue brings about. ',
-    'The supreme Way gives birth to the myriad things without owning them; it completes the work of transformation without lording over them. ',
-    'Creeping things and breathing creatures, fluttering and crawling, all depend on it for life — yet none thank its virtue; all depend on it for death — yet none reproach it. ',
-    'Those who gain it do not glorify; those who lose it do not begrudge. Hoard and amass — it grows no richer; distribute and bestow — it grows no poorer. ',
-    'Vague and shadowy — it cannot be imaged; shadowy and vague — yet its use is inexhaustible. ',
-    'Hidden and dark — it answers what has no form; flowing and pierced through — it never moves in vain. ',
-    'With the hard and the soft it rolls and unrolls; with yin and yang it bows and rises. ',
-    'The Two August Ones of high antiquity grasped the handle of the Way, stood in the centre, and roamed with transformation to soothe the four quarters. ',
-    'Thus Heaven can revolve and Earth abide, round again and again it goes.',
-].join('');
-
-/*
- * Helper: given the array of sentence-strings used to build the concatenated
- * text, compute the [start, end) index of the sentence at `sentenceIndex`.
- */
-function sentenceRange(sentences: string[], sentenceIndex: number): [number, number] {
-    let start = 0;
-    for (let i = 0; i < sentenceIndex; i++) start += sentences[i].length;
-    return [start, start + sentences[sentenceIndex].length];
-}
-
-// Sentence arrays (same order as above) — kept for computing character offsets
-const zhSentences = [
-    '夫道者，覆天載地，廓四方，柝八極，高不可際，深不可測，包裹天地，稟授無形。',
-    '原流泉浡，沖而徐盈；混混滑滑，濁而徐清。',
-    '故植之而塞於天地，橫之而彌於四海；施之無窮，而無所朝夕。',
-    '舒之幎於六合，卷之不盈於一握。',
-    '約而能張，幽而能明，弱而能強，柔而能剛。',
-    '橫四維而含陰陽，紘宇宙而章三光。',
-    '甚淖而滒，甚纖而微。',
-    '山以之高，淵以之深，獸以之走，鳥以之飛。',
-    '日月以之明，星辰以之行，麟以之游，鳳以之翔。',
-    '泰古二皇，得道之柄，立於中央，神與化游，以撫四方。',
-    '是故能天運地滯，輪轉而無廢；水流而不息，與萬物終始。',
-    '風興雲蒸，事無不應；雷聲雨降，並應無窮。',
-    '鬼出電入，龍興鸞集；鈞旋轂轉，週而復匝。',
-    '已雕已琢，還反於樸。',
-    '無為為之而合於道，無為言之而通乎德。',
-    '恬愉無矜而得於和，有萬不同而便於性。',
-    '神托於秋豪之末，而大宇宙之總，其德優天地而和陰陽。',
-    '節四時而調五行，呴諭覆育，萬物群生。',
-    '潤於草木，浸於金石，禽獸碩大，毫毛潤澤。',
-    '羽翼奮也，角觡生也；獸胎不殰，鳥卵不毈。',
-    '父無喪子之憂，兄無哭弟之哀；童子不孤，婦人不孀。',
-    '虹蜺不出，賊星不行，含德之所致也。',
-    '夫太上之道，生萬物而不有，成化像而弗宰。',
-    '跂行喙息，蠉飛蠕動，待而後生，莫之知德；待而後死，莫之能怨。',
-    '得之者不誾，失之者不譽。收聚畜積而不加富，布施稟受而不益貧。',
-    '忽兮恍兮，不可為象兮；恍兮忽兮，用不屈兮。',
-    '幽兮冥兮，應於無形兮；遂兮洞兮，不虛動兮。',
-    '與剛柔卷舒兮，與陰陽俯仰兮。',
-    '泰古二皇，得道之柄，立於中央，神與化遊，以撫四方。',
-    '是故能天運地滯，週而復匝。',
-];
-
-const enSentences = [
-    'The Way covers Heaven and bears up the Earth, extends the four directions and splits the eight ultimates, so high it cannot be reached, so deep it cannot be plumbed; it embraces Heaven and Earth and bestows form upon the formless. ',
-    'Like a rising spring it surges forth, void yet gradually filling; turbid and roiling, muddy yet gradually clearing. ',
-    'Set it upright and it fills Heaven and Earth; set it crosswise and it covers the four seas. Apply it without exhaustion, and it knows no morning or evening. ',
-    'Unfurled, it wraps the six directions; rolled up, it does not fill the hand. ',
-    'Bound, it can extend; obscure, it can illuminate; weak, it can be strong; soft, it can be hard. ',
-    'It crosses the four cardinals and embraces yin and yang; it bounds the cosmos and brightens the three lights. ',
-    'So watery it pools and flows; so fine it is barely perceptible. ',
-    'Mountains by it stand high, abysses by it run deep; beasts by it run, birds by it fly. ',
-    'The sun and moon by it shine, the stars by it course; the unicorn by it roams, the phoenix by it soars. ',
-    'In high antiquity the Two August Ones grasped the handle of the Way, stood in the centre, and roamed with the spirit of transformation to soothe the four directions. ',
-    'Therefore Heaven can revolve and Earth abide, the wheel turn without halting; water flow on unceasing, beginning and ending with the myriad things. ',
-    'Wind rises, clouds gather: nothing fails to answer. Thunder peals and rain descends, responding without end. ',
-    'Ghosts appear and lightning flees; dragons rise and luan-birds flock. The potter\'s wheel spins, the axle turns, and round again it goes. ',
-    'Carved and polished, it returns to the uncarved block. ',
-    'Act on it without acting, and it accords with the Way; speak of it without speaking, and it penetrates Virtue. ',
-    'Calm, content, and unboastful, one attains harmony; though the myriad things differ, all are at ease in their nature. ',
-    'Spirit lodges at the tip of an autumn hair yet encompasses the whole cosmos; its virtue exceeds Heaven and Earth and harmonises yin and yang. ',
-    'It regulates the four seasons and tunes the five phases; sighing it nurtures, covering and rearing the myriad living things. ',
-    'It moistens the grasses and trees, soaks into metal and stone; birds and beasts grow large, their down and fur all glossy. ',
-    'Feathers and wings beat, antlers and horns grow; beasts in womb do not miscarry, eggs in shell do not addle. ',
-    'No father grieves the loss of a son, no elder brother weeps a younger; children are not orphaned, wives are not widowed. ',
-    'No rainbows of ill omen appear, no rogue stars wander — such is what the embrace of Virtue brings about. ',
-    'The supreme Way gives birth to the myriad things without owning them; it completes the work of transformation without lording over them. ',
-    'Creeping things and breathing creatures, fluttering and crawling, all depend on it for life — yet none thank its virtue; all depend on it for death — yet none reproach it. ',
-    'Those who gain it do not glorify; those who lose it do not begrudge. Hoard and amass — it grows no richer; distribute and bestow — it grows no poorer. ',
-    'Vague and shadowy — it cannot be imaged; shadowy and vague — yet its use is inexhaustible. ',
-    'Hidden and dark — it answers what has no form; flowing and pierced through — it never moves in vain. ',
-    'With the hard and the soft it rolls and unrolls; with yin and yang it bows and rises. ',
-    'The Two August Ones of high antiquity grasped the handle of the Way, stood in the centre, and roamed with transformation to soothe the four quarters. ',
-    'Thus Heaven can revolve and Earth abide, round again and again it goes.',
-];
-
-/* Build inline-parallel entries. Each entry maps a sentence index to a parallel ref. */
-interface ParallelDef {
-    sentenceIndex: number;
-    textId: string;
-    chapterId: string;
-    segmentId: string;
-    colorKey: ColorKey;
-}
-
-const yuanDaoParallelDefs: ParallelDef[] = [
-    // Sentence 0: 夫道者… → Laozi
-    { sentenceIndex: 0, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-01-02', colorKey: 'laozi' },
-    // Sentence 3: 舒之幎於六合… → Laozi + Wenzi
-    { sentenceIndex: 3, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-01-04', colorKey: 'laozi' },
-    { sentenceIndex: 3, textId: 'wenzi', chapterId: 'wz-dao-yuan', segmentId: 'wz-03', colorKey: 'wenzi' },
-    // Sentence 7: 山以之高… → Zhuangzi
-    { sentenceIndex: 7, textId: 'zhuangzi', chapterId: 'zz-da-zong-shi', segmentId: 'zz-05', colorKey: 'zhuangzi' },
-    // Sentence 9: 泰古二皇… → Guanzi
-    { sentenceIndex: 9, textId: 'guanzi', chapterId: 'gz-bai-xin', segmentId: 'gz-04', colorKey: 'guanzi' },
-    // Sentence 11: 風興雲蒸… → Zhuangzi + Lüshi Chunqiu + Guanzi
-    { sentenceIndex: 11, textId: 'zhuangzi', chapterId: 'zz-da-zong-shi', segmentId: 'zz-08', colorKey: 'zhuangzi' },
-    { sentenceIndex: 11, textId: 'lushi-chunqiu', chapterId: 'lsc-gui-gong', segmentId: 'lsc-02', colorKey: 'lushi-chunqiu' },
-    { sentenceIndex: 11, textId: 'guanzi', chapterId: 'gz-bai-xin', segmentId: 'gz-07', colorKey: 'guanzi' },
-    // Sentence 13: 已雕已琢… → Laozi
-    { sentenceIndex: 13, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-28', colorKey: 'laozi' },
-    // Sentence 14: 無為為之… → Laozi + Wenzi
-    { sentenceIndex: 14, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-37', colorKey: 'laozi' },
-    { sentenceIndex: 14, textId: 'wenzi', chapterId: 'wz-dao-yuan', segmentId: 'wz-08', colorKey: 'wenzi' },
-    // Sentence 16: 神托於秋豪… → Zhuangzi
-    { sentenceIndex: 16, textId: 'zhuangzi', chapterId: 'zz-da-zong-shi', segmentId: 'zz-11', colorKey: 'zhuangzi' },
-    // Sentence 19: 羽翼奮也… → Wenzi
-    { sentenceIndex: 19, textId: 'wenzi', chapterId: 'wz-dao-yuan', segmentId: 'wz-12', colorKey: 'wenzi' },
-    // Sentence 22: 夫太上之道… → Laozi
-    { sentenceIndex: 22, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-02-04', colorKey: 'laozi' },
-    // Sentence 23: 跂行喙息… → Zhuangzi
-    { sentenceIndex: 23, textId: 'zhuangzi', chapterId: 'zz-da-zong-shi', segmentId: 'zz-14', colorKey: 'zhuangzi' },
-    // Sentence 24: 得之者不誾… → Laozi + Zhuangzi
-    { sentenceIndex: 24, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-22', colorKey: 'laozi' },
-    { sentenceIndex: 24, textId: 'zhuangzi', chapterId: 'zz-da-zong-shi', segmentId: 'zz-17', colorKey: 'zhuangzi' },
-    // Sentence 25: 忽兮恍兮… → Laozi
-    { sentenceIndex: 25, textId: 'laozi', chapterId: 'ddj-1', segmentId: 'ddj-21', colorKey: 'laozi' },
-    // Sentence 28: 泰古二皇… (2nd occurrence) → Guanzi
-    { sentenceIndex: 28, textId: 'guanzi', chapterId: 'gz-bai-xin', segmentId: 'gz-10', colorKey: 'guanzi' },
-];
-
-const yuanDaoInlineParallels = yuanDaoParallelDefs.map((def) => {
-    const [startZh, endZh] = sentenceRange(zhSentences, def.sentenceIndex);
-    const [startEn, endEn] = sentenceRange(enSentences, def.sentenceIndex);
-    return {
-        startZh,
-        endZh,
-        startEn,
-        endEn,
-        textId: def.textId,
-        chapterId: def.chapterId,
-        segmentId: def.segmentId,
-        colorKey: def.colorKey,
-    };
-});
+const chap1Built = buildChapter(chap1Data);
 
 const huainanzi: ContinuousText = {
     id: 'huainanzi',
     title: { zh: '淮南子', en: 'Huainanzi' },
     chapters: [
         {
-            id: 'yuan-dao',
+            id: 'chap-1',
             title: { zh: '原道訓', en: 'Yuandao Xun — Originating in the Way' },
-            text: { zh: yuanDaoZh, en: yuanDaoEn },
-            inlineParallels: yuanDaoInlineParallels,
+            text: chap1Built.text,
+            inlineParallels: chap1Built.inlineParallels,
         },
     ],
 };
@@ -257,63 +56,228 @@ function mkText(
     };
 }
 
-const laozi = mkText(
-    'laozi',
-    '老子',
-    'Lǎozǐ — Dào Dé Jīng',
-    'laozi',
-    'ddj-1',
-    '道經',
-    'Book of the Way',
-    [
-        { id: 'ddj-01-01', zh: '道可道，非常道。', en: 'The Way that can be spoken is not the constant Way.' },
-        { id: 'ddj-01-02', zh: '名可名，非常名。', en: 'The name that can be named is not the constant name.' },
-        { id: 'ddj-01-03', zh: '無，名天地之始；有，名萬物之母。', en: 'Nothing — the name of the beginning of Heaven and Earth. Being — the name of the mother of the myriad things.' },
-        { id: 'ddj-01-04', zh: '故常無，欲以觀其妙；常有，欲以觀其徼。', en: 'In constant non-being, behold its mysteries; in constant being, behold its bounds.' },
-        { id: 'ddj-02-04', zh: '生而不有，為而不恃，功成而弗居。', en: 'Give birth without possessing; act without claiming; succeed without dwelling on it.' },
-        { id: 'ddj-14', zh: '視之不見名曰夷，聽之不聞名曰希，搏之不得名曰微。', en: 'Looked at but unseen — call it "level"; listened to but unheard — call it "rare"; grasped at but not held — call it "fine".' },
-        { id: 'ddj-21', zh: '道之為物，惟恍惟惚。惚兮恍兮，其中有象。', en: 'The Way as a thing — only vague, only shadowy. Shadowy yet vague: within it there are images.' },
-        { id: 'ddj-22', zh: '曲則全，枉則直，窪則盈，敝則新。', en: 'Bent, then whole; crooked, then straight; hollow, then full; worn, then new.' },
-        { id: 'ddj-28', zh: '樸散則為器，聖人用之則為官長。', en: 'When the uncarved block is divided, it becomes vessels. The sage uses it and becomes the chief of officials.' },
-        { id: 'ddj-29', zh: '是以聖人去甚，去奢，去泰。', en: 'Therefore the sage discards excess, discards extravagance, discards arrogance.' },
-        { id: 'ddj-37', zh: '道常無為而無不為。', en: 'The Way is constantly without action, and yet there is nothing it does not do.' },
-        { id: 'ddj-40', zh: '反者道之動；弱者道之用。', en: 'Reversal is the movement of the Way; weakness is the use of the Way.' },
-        { id: 'ddj-42', zh: '道生一，一生二，二生三，三生萬物。', en: 'The Way gives birth to one; one to two; two to three; three to the myriad things.' },
-        { id: 'ddj-48', zh: '為學日益，為道日損。', en: 'To pursue learning, daily increase; to pursue the Way, daily diminish.' },
-        { id: 'ddj-56', zh: '知者不言，言者不知。', en: 'Those who know do not speak; those who speak do not know.' },
-        { id: 'ddj-78', zh: '天下莫柔弱於水，而攻堅強者莫之能勝。', en: 'In all the world nothing is softer or weaker than water — yet for attacking the hard and strong nothing surpasses it.' },
+const laozi: Text = {
+    id: 'laozi',
+    title: { zh: '老子', en: 'Laozi' },
+    colorKey: 'laozi',
+    chapters: [
+        {
+            id: 'laozi-66',
+            title: { zh: '66', en: '' },
+            segments: [
+                { id: 'lz-66-01', content: { zh: '是以聖人處上而民不重，', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-37',
+            title: { zh: '37', en: '' },
+            segments: [
+                { id: 'lz-37-01', content: { zh: '道常無為而無不為。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-48',
+            title: { zh: '48', en: '' },
+            segments: [
+                { id: 'lz-48-01', content: { zh: '無為而無不為。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-39',
+            title: { zh: '39', en: '' },
+            segments: [
+                { id: 'lz-39-01', content: { zh: '故貴以賤為本，高以下為基。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-76',
+            title: { zh: '76', en: '' },
+            segments: [
+                { id: 'lz-76-01', content: { zh: '故堅強者死之徒，柔弱者生之徒。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-57',
+            title: { zh: '57', en: '' },
+            segments: [
+                { id: 'lz-57-01', content: { zh: '吾何以知其然哉？', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-78',
+            title: { zh: '78', en: '' },
+            segments: [
+                { id: 'lz-78-01', content: { zh: '天下莫柔弱於水，', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-50',
+            title: { zh: '50', en: '' },
+            segments: [
+                { id: 'lz-50-01', content: { zh: '出生入死。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-40',
+            title: { zh: '40', en: '' },
+            segments: [
+                { id: 'lz-40-01', content: { zh: '有生於無。', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-15',
+            title: { zh: '15', en: '' },
+            segments: [
+                { id: 'lz-15-01', content: { zh: '儼兮其若容； 敦兮其若樸；曠兮其若谷；混兮其若濁；', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-20',
+            title: { zh: '20', en: '' },
+            segments: [
+                { id: 'lz-20-01', content: { zh: '澹兮其若海，', en: '' } },
+            ],
+        },
+        {
+            id: 'laozi-03',
+            title: { zh: '3', en: '' },
+            segments: [
+                { id: 'lz-03-01', content: { zh: '是以聖人之治，', en: '' } },
+            ],
+        },
     ]
-);
+};
 
-const zhuangzi = mkText(
-    'zhuangzi',
-    '莊子',
-    'Zhuāngzǐ',
-    'zhuangzi',
-    'zz-da-zong-shi',
-    '大宗師',
-    'The Great and Venerable Teacher',
-    [
-        { id: 'zz-01', zh: '知天之所為，知人之所為者，至矣。', en: 'To know what Heaven does and what man does — that is the utmost.' },
-        { id: 'zz-02', zh: '夫道，有情有信，無為無形。', en: 'The Way has its essence and its sincerity; it has no acting, no form.' },
-        { id: 'zz-03', zh: '可傳而不可受，可得而不可見。', en: 'It can be transmitted but not received, attained but not seen.' },
-        { id: 'zz-04', zh: '自本自根，未有天地，自古以固存。', en: 'Self-rooted, self-based — before Heaven and Earth, from antiquity it stood firm.' },
-        { id: 'zz-05', zh: '神鬼神帝，生天生地。', en: 'It made the gods and the spirits, gave birth to Heaven and Earth.' },
-        { id: 'zz-06', zh: '在太極之先而不為高，在六極之下而不為深。', en: 'Above the supreme ultimate, yet not high; below the six ultimates, yet not deep.' },
-        { id: 'zz-07', zh: '先天地生而不為久，長於上古而不為老。', en: 'Born before Heaven and Earth, yet not ancient; older than highest antiquity, yet not aged.' },
-        { id: 'zz-08', zh: '希韋氏得之，以挈天地；伏戲氏得之，以襲氣母。', en: 'Xiwei obtained it, and held up Heaven and Earth; Fuxi obtained it, and harmonised the mother of breath.' },
-        { id: 'zz-09', zh: '維斗得之，終古不忒。', en: 'The Dipper obtained it, and from antiquity has not erred.' },
-        { id: 'zz-10', zh: '日月得之，終古不息。', en: 'The sun and moon obtained it, and from antiquity have not ceased.' },
-        { id: 'zz-11', zh: '堪坏得之，以襲崑崙。', en: 'Kanpi obtained it, and dwelt on Mount Kunlun.' },
-        { id: 'zz-12', zh: '禺強得之，立乎北極。', en: 'Yu Qiang obtained it, and stood at the north pole.' },
-        { id: 'zz-13', zh: '西王母得之，坐乎少廣。', en: 'The Queen Mother of the West obtained it, and sat at Shaoguang.' },
-        { id: 'zz-14', zh: '莫知其始，莫知其終。', en: 'No one knows its beginning, no one knows its end.' },
-        { id: 'zz-15', zh: '彭祖得之，上及有虞，下及五伯。', en: 'Peng Zu obtained it; above he reached Youyu, below he reached the Five Hegemons.' },
-        { id: 'zz-16', zh: '傅說得之，以相武丁。', en: 'Fu Yue obtained it, and served as minister to Wuding.' },
-        { id: 'zz-17', zh: '得之者，不可勝計；失之者，亦不可勝計。', en: 'Those who have obtained it are too many to count; those who have lost it are also too many to count.' },
-        { id: 'zz-19', zh: '有始也者，有未始有始也者；有未始有夫未始有始也者。', en: 'There is a beginning; there is a not-yet-having-a-beginning; there is a not-yet-having-that-not-yet-having-a-beginning.' },
+const xunzi: Text = {
+    id: 'xunzi',
+    title: { zh: '荀子', en: 'Xunzi' },
+    colorKey: 'xunzi',
+    chapters: [
+        {
+            id: 'junzi',
+            title: { zh: '君子', en: 'Junzi' },
+            segments: [
+                { id: 'xu-jz-01', content: { zh: '不言而信，不慮而知，', en: '' } },
+            ],
+        },
     ]
-);
+};
+
+const zhuangzi: Text = {
+    id: 'zhuangzi',
+    title: { zh: '莊子', en: 'Zhuāngzǐ' },
+    colorKey: 'zhuangzi',
+    chapters: [
+        {
+            id: 'zz-tiandi',
+            title: { zh: '天地', en: 'Heaven and Earth' },
+            segments: [
+                { id: 'zz-tia-01', content: { zh: '無為為之之謂天，無為言之之謂德，有萬不同之謂富。', en: '' } },
+                { id: 'zz-tia-02', content: { zh: '與物化', en: '' } },
+                { id: 'zz-tia-03', content: { zh: '至無而供其求，時騁而要其宿，大小、長短、修遠。」', en: '' } },
+                { id: 'zz-tia-04', content: { zh: '機心存於胸中，則純白不備；', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-qiwu-lun',
+            title: { zh: '齊物論', en: 'Qiwu Lun — Discourse on the Equalisation of Things' },
+            segments: [
+                { id: 'zz-qwl-01', content: { zh: '天下莫大於秋豪之末，而大山為小；', en: '' } },
+                { id: 'zz-qwl-02', content: { zh: '不道之道？', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-mati',
+            title: { zh: '馬蹄', en: 'Mati' },
+            segments: [
+                { id: 'zz-mati-01', content: { zh: '澤無舟梁；萬物群生，', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-keyi',
+            title: { zh: '刻意', en: 'Keyi' },
+            segments: [
+                { id: 'zz-keyi-01', content: { zh: '不可為象，', en: '' } },
+                { id: 'zz-keyi-02', content: { zh: '感而後應，迫而後動，', en: '' } },
+                { id: 'zz-keyi-03', content: { zh: '澹然無極', en: '' } },
+                { id: 'zz-keyi-04', content: { zh: '故曰：悲樂者，德之邪；喜怒者，道之過；好惡者，德之失。故心不憂樂，德之至也；一而不變，靜之至也；無所於忤，虛之至也；不與物交，惔之至也；無所於逆，粹之至也。', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-xiaoyaoyou',
+            title: { zh: '逍遙遊', en: 'Xiaoyaoyou — Free and Easy Wandering' },
+            segments: [
+                { id: 'zz-xyy-01', content: { zh: '羊角而上', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-zhibeiyou',
+            title: { zh: '知北遊', en: 'Zhibeiyou — Knowing Before the North' },
+            segments: [
+                { id: 'zz-zby-01', content: { zh: '與物化', en: '' } },
+                { id: 'zz-zby-02', content: { zh: '聽之不聞其聲，視之不見其形，', en: '' } },
+                { id: 'zz-zby-03', content: { zh: '惛然若亡而存，', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-zeyang',
+            title: { zh: '則陽', en: 'Zeyang' },
+            segments: [
+                { id: 'zz-zy-01', content: { zh: '與物化', en: '' } },
+                { id: 'zz-zy-02', content: { zh: '萬物有乎生而莫見其根，有乎出而莫見其門。', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-dasheng',
+            title: { zh: '大heng', en: 'Dasheng' },
+            segments: [
+                { id: 'zz-ds-01', content: { zh: '與物化', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-waiwu',
+            title: { zh: '外物', en: 'Waiwu' },
+            segments: [
+                { id: 'zz-ww-01', content: { zh: '木與木相摩則然，金與火相守則流。', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-tianyun',
+            title: { zh: '天運', en: 'Tianyun' },
+            segments: [
+                { id: 'zz-ty-01', content: { zh: '性不可易，', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-qiushui',
+            title: { zh: '秋水', en: 'Qiushui' },
+            segments: [
+                { id: 'zz-qy-01', content: { zh: '井蛙不可以語於海者，拘於虛也；夏蟲不可以語於冰者，篤於時也；曲士不可以語於道者，束於教也。', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-gengsangchu',
+            title: { zh: '庚桑楚', en: 'Gengsang Chu' },
+            segments: [
+                { id: 'zz-gsc-01', content: { zh: '以其所好', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-shanxing',
+            title: { zh: '山木', en: 'Shanxing' },
+            segments: [
+                { id: 'zz-sx-01', content: { zh: '是故安而不順。', en: '' } },
+            ],
+        },
+        {
+            id: 'zz-xuwugui',
+            title: { zh: '徐無有', en: 'Xu Wugui' },
+            segments: [
+                { id: 'zz-xw-01', content: { zh: '彼之謂不道之道，', en: '' } },
+            ],
+        },
+    ],
+};
 
 const lushiChunqiu = mkText(
     'lushi-chunqiu',
@@ -488,4 +452,5 @@ export const sampleParallelTexts: Text[] = [
     hanfeizi,
     shanhaijing,
     shiji,
+    xunzi,
 ];

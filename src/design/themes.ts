@@ -29,6 +29,7 @@ const COLOR_KEYS: Array<keyof Tokens['color']['dot']> = [
   'hanfeizi',
   'shanhaijing',
   'shiji',
+  'xunzi'
 ];
 
 /**

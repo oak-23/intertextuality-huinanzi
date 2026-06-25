@@ -71,7 +71,7 @@ export const initialAppState: AppState = {
   displayMode: 'rhymed',
   viewMode: 'normal',
   sidebarOpen: true,
-  activeChapterId: 'yuan-dao',
+  activeChapterId: 'chap-1',
   selectedSegmentId: null,
   parallelPanel: null,
   panelsSwapped: false,
