@@ -23,13 +23,8 @@ export function getTheme(mode: ViewMode): Tokens {
 const COLOR_KEYS: Array<keyof Tokens['color']['dot']> = [
   'laozi',
   'zhuangzi',
-  'lushi-chunqiu',
-  'wenzi',
-  'guanzi',
-  'hanfeizi',
-  'shanhaijing',
-  'shiji',
-  'xunzi'
+  'xunzi',
+  'liji'
 ];
 
 /**
