@@ -1,13 +1,13 @@
-import { Popover } from '../shared/Popover';
-import type { Parallel, Language } from '../../types';
-import { useRepositories } from '../../context/RepositoryContext';
+import { Popover } from "../shared/Popover";
+import type { InlineParallel, Language } from "../../types";
+import { useRepositories } from "../../context/RepositoryContext";
 
 export interface MultiParallelPopoverProps {
   open: boolean;
   anchor: HTMLElement | null;
-  parallels: Parallel[];
+  parallels: InlineParallel[];
   language: Language;
-  onSelect: (parallel: Parallel) => void;
+  onSelect: (parallel: InlineParallel) => void;
   onClose: () => void;
 }
 
@@ -33,13 +33,14 @@ export function MultiParallelPopover({
         <div
           className="px-3 pt-1 pb-2 uppercase"
           style={{
-            color: 'var(--color-muted)',
+            color: "var(--color-muted)",
             fontSize: 11,
             fontWeight: 500,
-            letterSpacing: '0.06em',
+            letterSpacing: "0.06em",
           }}
         >
-          Found in {parallels.length} other {parallels.length === 1 ? 'text' : 'texts'}
+          Found in {parallels.length} other{" "}
+          {parallels.length === 1 ? "text" : "texts"}
         </div>
         {parallels.map((p, i) => {
           const text = texts.getParallelText(p.textId);
@@ -68,23 +69,23 @@ export function MultiParallelPopover({
                 <span
                   className="block"
                   style={{
-                    fontFamily: 'var(--font-ui)',
+                    fontFamily: "var(--font-ui)",
                     fontSize: 14,
                     fontWeight: 500,
-                    color: 'var(--color-text-primary)',
+                    color: "var(--color-text-primary)",
                   }}
                 >
-                  {language === 'zh' ? text.title.zh : text.title.en}
+                  {language === "zh" ? text.title.zh : text.title.en}
                 </span>
                 <span
                   className="block"
                   style={{
-                    fontFamily: 'var(--font-ui)',
+                    fontFamily: "var(--font-ui)",
                     fontSize: 12,
-                    color: 'var(--color-muted)',
+                    color: "var(--color-muted)",
                   }}
                 >
-                  {language === 'zh' ? text.title.en : text.title.zh}
+                  {language === "zh" ? text.title.en : text.title.zh}
                 </span>
               </span>
             </button>
