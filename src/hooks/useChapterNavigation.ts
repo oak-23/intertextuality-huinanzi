@@ -1,18 +1,21 @@
 import { useCallback, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { useRepositories } from '../context/RepositoryContext';
-import type { Chapter } from '../types';
+import type { ContinuousChapter } from '../types';
 
 export interface UseChapterNavigationReturn {
-  chapters: Chapter[];
-  activeChapter: Chapter | null;
+  chapters: ContinuousChapter[];
+  activeChapter: ContinuousChapter | null;
   switchChapter: (chapterId: string) => void;
 }
 
 export function useChapterNavigation(): UseChapterNavigationReturn {
   const { state, setActiveChapter } = useApp();
   const { texts } = useRepositories();
-  const chapters = useMemo(() => texts.getMainText().chapters, [texts]);
+  const chapters = useMemo(
+    () => texts.getMainContinuousText()?.chapters ?? [],
+    [texts]
+  );
   const activeChapter = useMemo(
     () => chapters.find((c) => c.id === state.activeChapterId) ?? chapters[0] ?? null,
     [chapters, state.activeChapterId]

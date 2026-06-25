@@ -11,7 +11,8 @@ export type ColorKey =
   | 'guanzi'
   | 'hanfeizi'
   | 'shanhaijing'
-  | 'shiji';
+  | 'shiji'
+  | 'xunzi';
 
 export interface BiLingual {
   zh: string;
@@ -33,7 +34,7 @@ export interface Segment {
     zhRhymed?: string;
     enRhymed?: string;
   };
-  parallels: Parallel[];
+  parallels?: Parallel[];
 }
 
 export interface Chapter {

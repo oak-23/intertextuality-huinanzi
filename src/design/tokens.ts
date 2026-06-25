@@ -41,6 +41,7 @@ export const tokens = {
       hanfeizi: '#009688',
       shanhaijing: '#E91E63',
       shiji: '#FFC107',
+      xunzi: '#795548',
     } as Record<ColorKey, string>,
     highlight: {
       laozi: '#FFCCB9',
@@ -51,6 +52,7 @@ export const tokens = {
       hanfeizi: '#99D5CF',
       shanhaijing: '#F6A5C0',
       shiji: '#FFE69B',
+      xunzi: '#BCAAA4',
     } as Record<ColorKey, string>,
   },
   typography: {
