@@ -180,12 +180,12 @@ const liji: Text = {
 
 const zhuangzi: Text = {
   id: "zhuangzi",
-  title: { zh: "莊子", en: "Zhuāngzǐ" },
+  title: { zh: "莊子", en: "Zhuangzi" },
   colorKey: "zhuangzi",
   chapters: [
     {
       id: "zz-tiandi",
-      title: { zh: "天地", en: "Heaven and Earth" },
+      title: { zh: "天地", en: "Tiandi" },
       segments: [
         {
           id: "zz-tia-01",

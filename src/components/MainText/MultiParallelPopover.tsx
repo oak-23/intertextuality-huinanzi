@@ -15,7 +15,6 @@ export function MultiParallelPopover({
   open,
   anchor,
   parallels,
-  language,
   onSelect,
   onClose,
 }: MultiParallelPopoverProps) {
@@ -45,6 +44,11 @@ export function MultiParallelPopover({
         {parallels.map((p, i) => {
           const text = texts.getParallelText(p.textId);
           if (!text) return null;
+          const chapter = text.chapters.find((c) => c.id === p.chapterId);
+          const chapterTitleZh = chapter?.title.zh || p.chapterId;
+          const chapterTitleEn = chapter?.title.en || p.chapterId;
+          const textTitleZh = text.title.zh || p.textId;
+          const textTitleEn = text.title.en || p.textId;
           return (
             <button
               key={`${p.textId}-${i}`}
@@ -65,7 +69,7 @@ export function MultiParallelPopover({
                   flexShrink: 0,
                 }}
               />
-              <span className="flex-1 min-w-0">
+              <span className="flex-1 min-w-0 flex flex-col">
                 <span
                   className="block"
                   style={{
@@ -75,17 +79,42 @@ export function MultiParallelPopover({
                     color: "var(--color-text-primary)",
                   }}
                 >
-                  {language === "zh" ? text.title.zh : text.title.en}
+                  {textTitleZh}
                 </span>
                 <span
-                  className="block"
+                  className="block mt-0.5 italic"
                   style={{
                     fontFamily: "var(--font-ui)",
                     fontSize: 12,
                     color: "var(--color-muted)",
                   }}
                 >
-                  {language === "zh" ? text.title.en : text.title.zh}
+                  {textTitleEn}
+                </span>
+              </span>
+              <span
+                className="shrink-0 text-right flex flex-col items-end"
+                style={{
+                  width: 96,
+                  fontFamily: "var(--font-ui)",
+                  fontSize: 11,
+                  color: "var(--color-muted)",
+                }}
+              >
+                <span className="block">{chapterTitleZh}</span>
+                <span
+                  className="block mt-0.5 italic"
+                  style={{
+                    display: "-webkit-box",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 2,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {`"${chapterTitleEn}"`}
                 </span>
               </span>
             </button>
