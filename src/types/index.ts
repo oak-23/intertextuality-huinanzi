@@ -62,6 +62,17 @@ export interface InlineParallel {
   enContext?: string;
 }
 
+export interface ParallelOption {
+  textId: string;
+  chapterId: string;
+  segmentId: string;
+  colorKey: ColorKey;
+  zhMatch?: string;
+  enMatch?: string;
+  zhContext?: string;
+  enContext?: string;
+}
+
 /** A chapter with continuous (unsegmented) text */
 export interface ContinuousChapter {
   id: string;

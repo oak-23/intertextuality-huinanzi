@@ -3,7 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { useToast } from "../shared/Toast";
 import { MultiParallelPopover } from "./MultiParallelPopover";
-import type { InlineParallel } from "../../types";
+import type { InlineParallel, ParallelOption } from "../../types";
 
 export interface MainTextProps {
   className?: string;
@@ -90,7 +90,7 @@ export function MainText({ className }: MainTextProps) {
   const { show } = useToast();
 
   const [multiAnchor, setMultiAnchor] = useState<HTMLElement | null>(null);
-  const [multiParallels, setMultiParallels] = useState<InlineParallel[]>([]);
+  const [multiParallels, setMultiParallels] = useState<ParallelOption[]>([]);
 
   const continuousText = texts.getMainContinuousText();
   const chapter =
