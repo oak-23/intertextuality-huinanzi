@@ -1,13 +1,13 @@
-import { Popover } from '../shared/Popover';
-import type { Parallel, Language } from '../../types';
-import { useRepositories } from '../../context/RepositoryContext';
+import { Popover } from "../shared/Popover";
+import type { Language, ParallelOption } from "../../types";
+import { useRepositories } from "../../context/RepositoryContext";
 
 export interface MultiParallelPopoverProps {
   open: boolean;
   anchor: HTMLElement | null;
-  parallels: Parallel[];
+  parallels: ParallelOption[];
   language: Language;
-  onSelect: (parallel: Parallel) => void;
+  onSelect: (parallel: ParallelOption) => void;
   onClose: () => void;
 }
 
@@ -15,7 +15,6 @@ export function MultiParallelPopover({
   open,
   anchor,
   parallels,
-  language,
   onSelect,
   onClose,
 }: MultiParallelPopoverProps) {
@@ -33,17 +32,23 @@ export function MultiParallelPopover({
         <div
           className="px-3 pt-1 pb-2 uppercase"
           style={{
-            color: 'var(--color-muted)',
+            color: "var(--color-muted)",
             fontSize: 11,
             fontWeight: 500,
-            letterSpacing: '0.06em',
+            letterSpacing: "0.06em",
           }}
         >
-          Found in {parallels.length} other {parallels.length === 1 ? 'text' : 'texts'}
+          Found in {parallels.length} other{" "}
+          {parallels.length === 1 ? "text" : "texts"}
         </div>
         {parallels.map((p, i) => {
           const text = texts.getParallelText(p.textId);
           if (!text) return null;
+          const chapter = text.chapters.find((c) => c.id === p.chapterId);
+          const chapterTitleZh = chapter?.title.zh || p.chapterId;
+          const chapterTitleEn = chapter?.title.en || p.chapterId;
+          const textTitleZh = text.title.zh || p.textId;
+          const textTitleEn = text.title.en || p.textId;
           return (
             <button
               key={`${p.textId}-${i}`}
@@ -64,27 +69,52 @@ export function MultiParallelPopover({
                   flexShrink: 0,
                 }}
               />
-              <span className="flex-1 min-w-0">
+              <span className="flex-1 min-w-0 flex flex-col">
                 <span
                   className="block"
                   style={{
-                    fontFamily: 'var(--font-ui)',
+                    fontFamily: "var(--font-ui)",
                     fontSize: 14,
                     fontWeight: 500,
-                    color: 'var(--color-text-primary)',
+                    color: "var(--color-text-primary)",
                   }}
                 >
-                  {language === 'zh' ? text.title.zh : text.title.en}
+                  {textTitleZh}
                 </span>
                 <span
-                  className="block"
+                  className="block mt-0.5 italic"
                   style={{
-                    fontFamily: 'var(--font-ui)',
+                    fontFamily: "var(--font-ui)",
                     fontSize: 12,
-                    color: 'var(--color-muted)',
+                    color: "var(--color-muted)",
                   }}
                 >
-                  {language === 'zh' ? text.title.en : text.title.zh}
+                  {textTitleEn}
+                </span>
+              </span>
+              <span
+                className="shrink-0 text-right flex flex-col items-end"
+                style={{
+                  width: 96,
+                  fontFamily: "var(--font-ui)",
+                  fontSize: 11,
+                  color: "var(--color-muted)",
+                }}
+              >
+                <span className="block">{chapterTitleZh}</span>
+                <span
+                  className="block mt-0.5 italic"
+                  style={{
+                    display: "-webkit-box",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 2,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {`"${chapterTitleEn}"`}
                 </span>
               </span>
             </button>

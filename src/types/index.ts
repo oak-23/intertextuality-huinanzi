@@ -1,17 +1,19 @@
-export type Language = 'zh' | 'en';
-export type DisplayMode = 'prose' | 'rhymed';
-export type ViewMode = 'normal' | 'research';
-export type SearchScope = 'main' | 'parallel';
+export type Language = "zh" | "en";
+export type DisplayMode = "prose" | "rhymed";
+export type ViewMode = "normal" | "research";
+export type SearchScope = "main" | "parallel";
 
 export type ColorKey =
-  | 'laozi'
-  | 'zhuangzi'
-  | 'lushi-chunqiu'
-  | 'wenzi'
-  | 'guanzi'
-  | 'hanfeizi'
-  | 'shanhaijing'
-  | 'shiji';
+  | "laozi"
+  | "zhuangzi"
+  | "lushi-chunqiu"
+  | "wenzi"
+  | "guanzi"
+  | "hanfeizi"
+  | "shanhaijing"
+  | "shiji"
+  | "xunzi"
+  | "liji";
 
 export interface BiLingual {
   zh: string;
@@ -33,7 +35,7 @@ export interface Segment {
     zhRhymed?: string;
     enRhymed?: string;
   };
-  parallels: Parallel[];
+  parallels?: Parallel[];
 }
 
 export interface Chapter {
@@ -55,6 +57,21 @@ export interface InlineParallel {
   chapterId: string;
   segmentId: string;
   colorKey: ColorKey;
+  zhMatch?: string;
+  enMatch?: string;
+  zhContext?: string;
+  enContext?: string;
+}
+
+export interface ParallelOption {
+  textId: string;
+  chapterId: string;
+  segmentId: string;
+  colorKey: ColorKey;
+  zhMatch?: string;
+  enMatch?: string;
+  zhContext?: string;
+  enContext?: string;
 }
 
 /** A chapter with continuous (unsegmented) text */
