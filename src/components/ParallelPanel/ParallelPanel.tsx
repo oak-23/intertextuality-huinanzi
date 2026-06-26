@@ -192,19 +192,21 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             </h2>
             {chapter && (
               <>
-                <p
-                  style={{
-                    fontFamily: "var(--font-ui)",
-                    fontWeight: 500,
-                    fontSize: 11,
-                    letterSpacing: "0.15em",
-                    textTransform: "uppercase",
-                    color: "var(--color-secondary)",
-                    marginBottom: 8,
-                  }}
-                >
-                  {`"${chapter.title.en}"`}
-                </p>
+                {chapter.title.en ? (
+                  <p
+                    style={{
+                      fontFamily: "var(--font-ui)",
+                      fontWeight: 500,
+                      fontSize: 11,
+                      letterSpacing: "0.15em",
+                      textTransform: "uppercase",
+                      color: "var(--color-secondary)",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {`"${chapter.title.en}"`}
+                  </p>
+                ) : null}
                 <h3
                   className="font-serif"
                   style={{
