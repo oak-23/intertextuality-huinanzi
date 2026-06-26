@@ -217,7 +217,7 @@ const zhuangzi: Text = {
       id: "zz-qiwu-lun",
       title: {
         zh: "齊物論",
-        en: "Qiwu Lun — Discourse on the Equalisation of Things",
+        en: "Qiwu Lun",
       },
       segments: [
         {
@@ -256,7 +256,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-xiaoyaoyou",
-      title: { zh: "逍遙遊", en: "Xiaoyaoyou — Free and Easy Wandering" },
+      title: { zh: "逍遙遊", en: "Xiaoyaoyou" },
       segments: [
         { id: "zz-xyy-01", content: { zh: "羊角而上", en: "" } },
         { id: "zz-xyy-02", content: { zh: "則所用之異也。", en: "" } },
@@ -264,7 +264,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-zhibeiyou",
-      title: { zh: "知北遊", en: "Zhibeiyou — Knowing Before the North" },
+      title: { zh: "知北遊", en: "Zhi beiyou" },
       segments: [
         { id: "zz-zby-01", content: { zh: "與物化", en: "" } },
         {

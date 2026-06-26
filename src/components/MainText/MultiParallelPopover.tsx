@@ -102,20 +102,22 @@ export function MultiParallelPopover({
                 }}
               >
                 <span className="block">{chapterTitleZh}</span>
-                <span
-                  className="block mt-0.5 italic"
-                  style={{
-                    display: "-webkit-box",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    WebkitBoxOrient: "vertical",
-                    WebkitLineClamp: 2,
-                    whiteSpace: "normal",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {`"${chapterTitleEn}"`}
-                </span>
+                {chapterTitleEn ? (
+                  <span
+                    className="block mt-0.5"
+                    style={{
+                      display: "-webkit-box",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 2,
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {`"${chapterTitleEn}"`}
+                  </span>
+                ) : null}
               </span>
             </button>
           );
