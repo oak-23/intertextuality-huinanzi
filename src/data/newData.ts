@@ -269,7 +269,7 @@ const zhuangzi: Text = {
         { id: "zz-zby-01", content: { zh: "與物化", en: "" } },
         {
           id: "zz-zby-02",
-          content: { zh: "聽之不聞其聲，視之不見其形，", en: "" },
+          content: { zh: "終日視之而不見，聽之而不聞，搏之而不得也。", en: "" },
         },
         { id: "zz-zby-03", content: { zh: "惛然若亡而存，", en: "" } },
         {
@@ -322,6 +322,7 @@ const zhuangzi: Text = {
           id: "zz-ty-04",
           content: { zh: "望之而不能見也，逐之而不能及也，", en: "" },
         },
+        { id: "zz-ty-05", content: { zh: "聽之不聞其聲，視之不見其形，", en: "" } },
       ],
     },
     {
