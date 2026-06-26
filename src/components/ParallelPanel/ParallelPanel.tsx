@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, ChevronLeft } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
-import type { InlineParallel } from "../../types";
+import { MultiParallelPopover } from "../MainText/MultiParallelPopover";
+import type { InlineParallel, ParallelOption } from "../../types";
 // ParallelPanel reads token-defined CSS vars only — no hardcoded hex.
 
 export interface ParallelPanelProps {
@@ -88,7 +89,25 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
 
   const isOpen = !!panel || !!listText;
 
-  const handleListItemClick = (p: InlineParallel) => {
+  // Merge parallels that point to the SAME main-text highlight (identical
+  // character range) into one entry — exactly the multi-parallel spans the
+  // main text renders as a single highlight with a chooser popover.
+  const listGroups: InlineParallel[][] = (() => {
+    const map = new Map<string, InlineParallel[]>();
+    for (const p of listItems) {
+      const k = `${p.startZh}:${p.endZh}`;
+      const g = map.get(k);
+      if (g) g.push(p);
+      else map.set(k, [p]);
+    }
+    return [...map.values()];
+  })();
+
+  const [multiAnchor, setMultiAnchor] = useState<HTMLElement | null>(null);
+  const [multiParallels, setMultiParallels] = useState<ParallelOption[]>([]);
+
+  // Open a single parallel passage (text mode) + flash its main-text highlight.
+  const openOne = (p: ParallelOption) => {
     const seg = texts.getSegment(p.textId, p.chapterId, p.segmentId);
     const highlightText =
       lang === "zh"
@@ -105,6 +124,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   };
 
   useEffect(() => {
+    setMultiAnchor(null); // never carry a stale popover across mode/source switches
     if (isOpen && containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
@@ -316,8 +336,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                 color: "var(--color-secondary)",
               }}
             >
-              {listItems.length}{" "}
-              {listItems.length === 1 ? "parallel" : "parallels"}
+              {listGroups.length}{" "}
+              {listGroups.length === 1 ? "parallel" : "parallels"}
             </p>
             <div
               aria-hidden
@@ -330,17 +350,26 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             />
           </header>
           <ol style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {listItems.map((p, i) => {
+            {listGroups.map((group, i) => {
+              const p = group[0];
+              const count = group.length;
               const snippet =
                 (lang === "zh" ? p.zhMatch : p.enMatch) ||
                 p.zhMatch ||
                 p.enMatch ||
                 "";
               return (
-                <li key={`${p.segmentId}:${p.startZh}`}>
+                <li key={`${p.startZh}:${p.endZh}`}>
                   <button
                     type="button"
-                    onClick={() => handleListItemClick(p)}
+                    onClick={(e) => {
+                      if (count > 1) {
+                        setMultiParallels(group);
+                        setMultiAnchor(e.currentTarget);
+                      } else {
+                        openOne(p);
+                      }
+                    }}
                     className="w-full text-left flex items-start gap-3 transition-colors"
                     style={{
                       padding: "12px 8px",
@@ -372,7 +401,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                       {i + 1}.
                     </span>
                     <span
-                      className="font-serif"
+                      className="font-serif flex-1 min-w-0"
                       style={{
                         fontFamily: "var(--font-zh-body)",
                         fontSize: 16,
@@ -382,11 +411,37 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                     >
                       {snippet}
                     </span>
+                    {count > 1 && (
+                      <span
+                        aria-label={`${count} parallels at this location`}
+                        style={{
+                          flexShrink: 0,
+                          alignSelf: "center",
+                          fontFamily: "var(--font-ui)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: "var(--color-secondary)",
+                          backgroundColor: "var(--color-surface-container)",
+                          borderRadius: 9999,
+                          padding: "1px 8px",
+                        }}
+                      >
+                        {count}
+                      </span>
+                    )}
                   </button>
                 </li>
               );
             })}
           </ol>
+          <MultiParallelPopover
+            open={multiAnchor !== null}
+            anchor={multiAnchor}
+            parallels={multiParallels}
+            language={lang}
+            onSelect={(p) => openOne(p)}
+            onClose={() => setMultiAnchor(null)}
+          />
         </div>
       )}
     </aside>
