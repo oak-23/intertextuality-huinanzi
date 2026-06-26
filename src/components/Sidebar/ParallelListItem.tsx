@@ -1,52 +1,64 @@
-import type { ColorKey, Language } from '../../types';
+import type { ColorKey, Language } from "../../types";
+import { Toggle } from "../shared/Toggle";
 
 export interface ParallelListItemProps {
-  textId: string;
   colorKey: ColorKey;
   titleZh: string;
   titleEn: string;
+  count: number;
   language: Language;
-  hasParallels: boolean;
-  isCurrentlyViewed: boolean;
-  onClick: (textId: string, hasParallels: boolean) => void;
+  isActive: boolean;
+  isOn: boolean;
+  onOpen: () => void;
+  onToggle: () => void;
 }
 
 export function ParallelListItem({
-  textId,
   colorKey,
   titleZh,
   titleEn,
+  count,
   language,
-  hasParallels,
-  isCurrentlyViewed,
-  onClick,
+  isActive,
+  isOn,
+  onOpen,
+  onToggle,
 }: ParallelListItemProps) {
-  const titleZhDisplay = titleZh;
-  const subtitle = language === 'zh' ? titleEn : titleZh;
-  const primary = language === 'zh' ? titleZhDisplay : titleEn;
+  const primary = language === "zh" ? titleZh : titleEn;
+  const subtitle = language === "zh" ? titleEn : titleZh;
+  const dim = isOn ? 1 : 0.45;
 
   return (
-    <button
-      type="button"
-      onClick={() => onClick(textId, hasParallels)}
-      title={!hasParallels ? 'No parallels in this chapter' : undefined}
-      aria-current={isCurrentlyViewed ? 'true' : undefined}
+    <div
+      role="button"
+      tabIndex={0}
+      aria-current={isActive ? "true" : undefined}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return; // ignore keys from the Toggle
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
       className="w-full text-left flex items-center gap-3 transition-colors"
       style={{
-        padding: '12px 16px',
-        paddingLeft: isCurrentlyViewed ? 12 : 16,
-        borderLeft: isCurrentlyViewed
-          ? '4px solid var(--color-accent-bright)'
-          : '4px solid transparent',
-        backgroundColor: isCurrentlyViewed ? 'var(--color-surface-container)' : 'transparent',
-        opacity: hasParallels ? 1 : 0.55,
-        cursor: 'pointer',
+        padding: "12px 16px",
+        paddingLeft: isActive ? 12 : 16,
+        borderLeft: isActive
+          ? "4px solid var(--color-accent-bright)"
+          : "4px solid transparent",
+        backgroundColor: isActive
+          ? "var(--color-surface-container)"
+          : "transparent",
+        cursor: "pointer",
       }}
       onMouseEnter={(e) => {
-        if (!isCurrentlyViewed) e.currentTarget.style.backgroundColor = 'var(--color-surface-high)';
+        if (!isActive)
+          e.currentTarget.style.backgroundColor = "var(--color-surface-high)";
       }}
       onMouseLeave={(e) => {
-        if (!isCurrentlyViewed) e.currentTarget.style.backgroundColor = 'transparent';
+        if (!isActive) e.currentTarget.style.backgroundColor = "transparent";
       }}
     >
       <span
@@ -56,19 +68,18 @@ export function ParallelListItem({
           height: 8,
           borderRadius: 9999,
           backgroundColor: `var(--color-dot-${colorKey})`,
-          opacity: hasParallels ? 1 : 0.4,
+          opacity: dim,
           flexShrink: 0,
         }}
       />
-      <span className="flex flex-col min-w-0 flex-1">
+      <span className="flex flex-col min-w-0 flex-1" style={{ opacity: dim }}>
         <span
           className="truncate"
           style={{
-            fontFamily: 'var(--font-ui)',
+            fontFamily: "var(--font-ui)",
             fontSize: 14,
-            fontWeight: isCurrentlyViewed ? 600 : 500,
-            color: hasParallels ? 'var(--color-text-primary)' : 'var(--color-muted)',
-            fontStyle: hasParallels ? 'normal' : 'italic',
+            fontWeight: isActive ? 600 : 500,
+            color: "var(--color-text-primary)",
           }}
         >
           {primary}
@@ -76,14 +87,27 @@ export function ParallelListItem({
         <span
           className="truncate"
           style={{
-            fontFamily: 'var(--font-ui)',
+            fontFamily: "var(--font-ui)",
             fontSize: 12,
-            color: 'var(--color-muted)',
+            color: "var(--color-muted)",
           }}
         >
-          {subtitle}
+          {subtitle} · {count}
         </span>
       </span>
-    </button>
+      <span
+        onClick={(e) => e.stopPropagation()}
+        style={{ flexShrink: 0, display: "inline-flex" }}
+      >
+        <Toggle
+          checked={isOn}
+          onChange={onToggle}
+          size="sm"
+          ariaLabel={
+            isOn ? `Hide ${titleEn} highlights` : `Show ${titleEn} highlights`
+          }
+        />
+      </span>
+    </div>
   );
 }

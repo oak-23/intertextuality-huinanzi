@@ -42,6 +42,10 @@ export interface AppState {
   auth: AuthState;
   searchState: SearchState;
   zoomLevel: number;
+  /** Source-text ids whose highlights are toggled OFF in the main text. */
+  hiddenTexts: string[];
+  /** When set, the right panel shows the numbered parallel list for this source text. */
+  parallelListTextId: string | null;
 }
 
 export type AppAction =
@@ -61,7 +65,11 @@ export type AppAction =
   | { type: "SET_SEARCH_SCOPE"; scope: SearchScope }
   | { type: "SET_SEARCH_MATCHES"; matches: string[] }
   | { type: "SET_SEARCH_INDEX"; index: number }
-  | { type: "SET_ZOOM_LEVEL"; zoomLevel: number };
+  | { type: "SET_ZOOM_LEVEL"; zoomLevel: number }
+  | { type: "TOGGLE_TEXT_HIGHLIGHT"; textId: string }
+  | { type: "OPEN_PARALLEL_LIST"; textId: string }
+  | { type: "OPEN_PARALLEL_IN_LIST"; panel: ParallelPanelState }
+  | { type: "CLOSE_PARALLEL_LIST" };
 
 export const initialAppState: AppState = {
   language: "zh",
@@ -76,6 +84,8 @@ export const initialAppState: AppState = {
   auth: { loggedIn: false, email: null },
   searchState: { query: "", scope: "main", matches: [], currentIndex: 0 },
   zoomLevel: 1,
+  hiddenTexts: [],
+  parallelListTextId: null,
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -96,6 +106,7 @@ function reducer(state: AppState, action: AppAction): AppState {
         activeChapterId: action.chapterId,
         selectedSegmentId: null,
         parallelPanel: null,
+        parallelListTextId: null,
         panelsSwapped: false,
         searchState: {
           ...state.searchState,
@@ -110,6 +121,7 @@ function reducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         parallelPanel: action.panel,
+        parallelListTextId: null,
       };
     case "CLOSE_PARALLEL":
       return { ...state, parallelPanel: null, panelsSwapped: false };
@@ -150,6 +162,28 @@ function reducer(state: AppState, action: AppAction): AppState {
       };
     case "SET_ZOOM_LEVEL":
       return { ...state, zoomLevel: action.zoomLevel };
+    case "TOGGLE_TEXT_HIGHLIGHT":
+      return {
+        ...state,
+        hiddenTexts: state.hiddenTexts.includes(action.textId)
+          ? state.hiddenTexts.filter((t) => t !== action.textId)
+          : [...state.hiddenTexts, action.textId],
+      };
+    case "OPEN_PARALLEL_LIST":
+      return {
+        ...state,
+        parallelListTextId: action.textId,
+        parallelPanel: null,
+      };
+    case "OPEN_PARALLEL_IN_LIST":
+      return { ...state, parallelPanel: action.panel };
+    case "CLOSE_PARALLEL_LIST":
+      return {
+        ...state,
+        parallelPanel: null,
+        parallelListTextId: null,
+        panelsSwapped: false,
+      };
     default:
       return state;
   }
@@ -171,6 +205,10 @@ export interface AppContextValue {
   toggleAnnotationMode: () => void;
   setAuth: (auth: AuthState) => void;
   setZoomLevel: (zoomLevel: number) => void;
+  toggleTextHighlight: (textId: string) => void;
+  openParallelList: (textId: string) => void;
+  openParallelInList: (panel: ParallelPanelState) => void;
+  closeParallelList: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -236,6 +274,23 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
     (zoomLevel: number) => dispatch({ type: "SET_ZOOM_LEVEL", zoomLevel }),
     [],
   );
+  const toggleTextHighlight = useCallback(
+    (textId: string) => dispatch({ type: "TOGGLE_TEXT_HIGHLIGHT", textId }),
+    [],
+  );
+  const openParallelList = useCallback(
+    (textId: string) => dispatch({ type: "OPEN_PARALLEL_LIST", textId }),
+    [],
+  );
+  const openParallelInList = useCallback(
+    (panel: ParallelPanelState) =>
+      dispatch({ type: "OPEN_PARALLEL_IN_LIST", panel }),
+    [],
+  );
+  const closeParallelList = useCallback(
+    () => dispatch({ type: "CLOSE_PARALLEL_LIST" }),
+    [],
+  );
 
   const value = useMemo<AppContextValue>(
     () => ({
@@ -253,6 +308,10 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       toggleAnnotationMode,
       setAuth,
       setZoomLevel,
+      toggleTextHighlight,
+      openParallelList,
+      openParallelInList,
+      closeParallelList,
     }),
     [
       state,
@@ -268,6 +327,10 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       toggleAnnotationMode,
       setAuth,
       setZoomLevel,
+      toggleTextHighlight,
+      openParallelList,
+      openParallelInList,
+      closeParallelList,
     ],
   );
 
