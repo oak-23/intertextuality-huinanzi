@@ -1,77 +1,78 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
-import { useParallelNavigation } from "../../hooks/useParallelNavigation";
-import { useToast } from "../shared/Toast";
 import { ParallelListItem } from "./ParallelListItem";
-import { SidebarSearch } from "./SidebarSearch";
-import { useHighlightPulse } from "../../hooks/useHighlightPulse";
-import type { Text } from "../../types";
+import type { ColorKey } from "../../types";
 
 export interface ParallelListProps {
   className?: string;
 }
 
+interface TitleGroup {
+  textId: string;
+  colorKey: ColorKey;
+  titleZh: string;
+  titleEn: string;
+  count: number;
+  firstStart: number;
+}
+
 export function ParallelList({ className }: ParallelListProps) {
   const { texts } = useRepositories();
-  const { state } = useApp();
-  const { textHasParallelsInActiveChapter, openParallelForFirstMatch } =
-    useParallelNavigation();
-  const { pulse } = useHighlightPulse();
-  const { show } = useToast();
-  const [filter, setFilter] = useState("");
-
-  const allTexts = useMemo<Text[]>(() => texts.getAllParallelTexts(), [texts]);
+  const { state, openParallelList, toggleTextHighlight } = useApp();
   const language = state.language;
 
-  const filtered = useMemo(() => {
-    const q = filter.trim().toLowerCase();
-    if (!q) return allTexts;
-    return allTexts.filter((t) => {
-      const enMatch = t.title.en.toLowerCase().includes(q);
-      const zhMatch = t.title.zh.includes(filter.trim());
-      return enMatch || zhMatch;
-    });
-  }, [allTexts, filter]);
+  const continuousChapter = useMemo(
+    () => texts.getContinuousChapter(state.activeChapterId),
+    [texts, state.activeChapterId],
+  );
 
-  const handleClick = (textId: string, hasParallels: boolean) => {
-    if (!hasParallels) {
-      show("No parallels in this chapter.");
-      return;
+  // Group the chapter's inline parallels by source text ("the parallel title").
+  // One row per source, ordered by where its first parallel appears in the text.
+  const groups = useMemo<TitleGroup[]>(() => {
+    if (!continuousChapter) return [];
+    const map = new Map<string, TitleGroup>();
+    for (const p of continuousChapter.inlineParallels) {
+      if (p.startZh < 0) continue; // builder miss => no real highlight
+      const existing = map.get(p.textId);
+      if (existing) {
+        existing.count += 1;
+        existing.firstStart = Math.min(existing.firstStart, p.startZh);
+      } else {
+        const text = texts.getParallelText(p.textId);
+        map.set(p.textId, {
+          textId: p.textId,
+          colorKey: (text?.colorKey ?? p.colorKey) as ColorKey,
+          titleZh: text?.title.zh ?? p.textId,
+          titleEn: text?.title.en ?? p.textId,
+          count: 1,
+          firstStart: p.startZh,
+        });
+      }
     }
-    const ok = openParallelForFirstMatch(textId);
-    if (ok) {
-      // Pulse will be picked up by the segment that opened.
-      // Get first matching segment id for pulse:
-      const chapter = texts.getChapter(state.activeChapterId);
-      const segment = chapter?.segments.find((s) =>
-        s.parallels?.some((p) => p.textId === textId),
-      );
-      if (segment) pulse(segment.id);
-    }
-  };
+    return [...map.values()].sort((a, b) => a.firstStart - b.firstStart);
+  }, [continuousChapter, texts]);
 
   return (
-    <div className={`flex flex-col ${className ?? ""}`} style={{ gap: 16 }}>
-      <div style={{ padding: "0 16px" }}>
-        <SidebarSearch value={filter} onChange={setFilter} />
-      </div>
+    <div className={`flex flex-col ${className ?? ""}`}>
       <ul className="flex flex-col">
-        {filtered.map((t) => {
-          const colorKey = t.colorKey ?? "laozi";
-          const hasParallels = textHasParallelsInActiveChapter(t.id);
-          const isCurrentlyViewed = state.parallelPanel?.textId === t.id;
+        {groups.map((g) => {
+          // Active when this source's list is open, or one of its parallels is.
+          const isActive =
+            state.parallelListTextId === g.textId ||
+            state.parallelPanel?.textId === g.textId;
           return (
-            <li key={t.id}>
+            <li key={g.textId}>
               <ParallelListItem
-                textId={t.id}
-                colorKey={colorKey}
-                titleZh={t.title.zh}
-                titleEn={t.title.en}
+                colorKey={g.colorKey}
+                titleZh={g.titleZh}
+                titleEn={g.titleEn}
+                count={g.count}
                 language={language}
-                hasParallels={hasParallels}
-                isCurrentlyViewed={isCurrentlyViewed}
-                onClick={handleClick}
+                isActive={isActive}
+                isOn={!state.hiddenTexts.includes(g.textId)}
+                onOpen={() => openParallelList(g.textId)}
+                onToggle={() => toggleTextHighlight(g.textId)}
               />
             </li>
           );

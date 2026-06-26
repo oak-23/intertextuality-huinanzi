@@ -101,8 +101,10 @@ export function MainText({ className }: MainTextProps) {
     if (!chapter) return [];
     const fullText =
       state.language === "zh" ? chapter.text.zh : chapter.text.en;
-    return splitIntoSpans(fullText, chapter.inlineParallels, state.language);
-  }, [chapter, state.language]);
+    const hidden = new Set(state.hiddenTexts);
+    const visible = chapter.inlineParallels.filter((p) => !hidden.has(p.textId));
+    return splitIntoSpans(fullText, visible, state.language);
+  }, [chapter, state.language, state.hiddenTexts]);
 
   const handleHighlightClick = useCallback(
     (parallels: InlineParallel[], anchor: HTMLElement) => {

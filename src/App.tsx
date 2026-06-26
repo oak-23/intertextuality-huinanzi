@@ -8,7 +8,7 @@ import { CommandPalette } from './components/CommandPalette/CommandPalette';
 import { ZoomControl } from './components/ZoomControl/ZoomControl';
 
 export function App() {
-  const { state, closeParallel } = useApp();
+  const { state, closeParallel, closeParallelList } = useApp();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
@@ -27,17 +27,17 @@ export function App() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  // Global Escape handler: close the parallel panel if nothing else has taken it.
-  // Modals/popovers handle Escape themselves and stop propagation.
+  // Global Escape handler: step back through the parallel panel (passage ->
+  // list -> closed). Modals/popovers handle Escape themselves and stop propagation.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && state.parallelPanel) {
-        closeParallel();
-      }
+      if (e.key !== 'Escape') return;
+      if (state.parallelPanel) closeParallel();
+      else if (state.parallelListTextId) closeParallelList();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [state.parallelPanel, closeParallel]);
+  }, [state.parallelPanel, state.parallelListTextId, closeParallel, closeParallelList]);
 
   const sidebarOpen = state.sidebarOpen;
 
