@@ -46,6 +46,8 @@ export interface AppState {
   hiddenTexts: string[];
   /** When set, the right panel shows the numbered parallel list for this source text. */
   parallelListTextId: string | null;
+  /** When true (research mode only), bracketed parallel-title citations are hidden in the main text. */
+  hideParallelTitles: boolean;
 }
 
 export type AppAction =
@@ -67,6 +69,7 @@ export type AppAction =
   | { type: "SET_SEARCH_INDEX"; index: number }
   | { type: "SET_ZOOM_LEVEL"; zoomLevel: number }
   | { type: "TOGGLE_TEXT_HIGHLIGHT"; textId: string }
+  | { type: "TOGGLE_PARALLEL_TITLES" }
   | { type: "OPEN_PARALLEL_LIST"; textId: string }
   | { type: "OPEN_PARALLEL_IN_LIST"; panel: ParallelPanelState }
   | { type: "CLOSE_PARALLEL_LIST" };
@@ -86,6 +89,7 @@ export const initialAppState: AppState = {
   zoomLevel: 1,
   hiddenTexts: [],
   parallelListTextId: null,
+  hideParallelTitles: false,
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -184,6 +188,8 @@ function reducer(state: AppState, action: AppAction): AppState {
         parallelListTextId: null,
         panelsSwapped: false,
       };
+    case "TOGGLE_PARALLEL_TITLES":
+      return { ...state, hideParallelTitles: !state.hideParallelTitles };
     default:
       return state;
   }
@@ -206,6 +212,7 @@ export interface AppContextValue {
   setAuth: (auth: AuthState) => void;
   setZoomLevel: (zoomLevel: number) => void;
   toggleTextHighlight: (textId: string) => void;
+  toggleParallelTitles: () => void;
   openParallelList: (textId: string) => void;
   openParallelInList: (panel: ParallelPanelState) => void;
   closeParallelList: () => void;
@@ -278,6 +285,10 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
     (textId: string) => dispatch({ type: "TOGGLE_TEXT_HIGHLIGHT", textId }),
     [],
   );
+  const toggleParallelTitles = useCallback(
+    () => dispatch({ type: "TOGGLE_PARALLEL_TITLES" }),
+    [],
+  );
   const openParallelList = useCallback(
     (textId: string) => dispatch({ type: "OPEN_PARALLEL_LIST", textId }),
     [],
@@ -309,6 +320,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       setAuth,
       setZoomLevel,
       toggleTextHighlight,
+      toggleParallelTitles,
       openParallelList,
       openParallelInList,
       closeParallelList,
@@ -328,6 +340,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       setAuth,
       setZoomLevel,
       toggleTextHighlight,
+      toggleParallelTitles,
       openParallelList,
       openParallelInList,
       closeParallelList,

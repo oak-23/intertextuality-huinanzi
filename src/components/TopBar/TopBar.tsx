@@ -4,6 +4,7 @@ import { SearchBar } from './SearchBar';
 import { SwapPanelsToggle } from './SwapPanelsToggle';
 import { LanguageToggle } from './LanguageToggle';
 import { RhymedProseToggle } from './RhymedProseToggle';
+import { ParallelTitlesToggle } from './ParallelTitlesToggle';
 import { ChapterSelector } from './ChapterSelector';
 import { ModeSwitch } from './ModeSwitch';
 import { ReportButton } from './ReportButton';
@@ -104,6 +105,7 @@ export function TopBar({ className, onSearchClick }: TopBarProps) {
         <SwapPanelsToggle />
         <LanguageToggle />
         <RhymedProseToggle />
+        <ParallelTitlesToggle />
         <ChapterSelector />
         <ModeSwitch />
         <ReportButton />
