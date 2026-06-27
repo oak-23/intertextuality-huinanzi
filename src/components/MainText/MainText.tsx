@@ -20,6 +20,21 @@ interface TextSpan {
   parallels: InlineParallel[];
 }
 
+/** Matches an inline parallel-title citation: full-width-open bracket whose
+ * content has ≥1 Latin letter and no nested parens, closed by ） or ). */
+const PARALLEL_TITLE_RE = /（[^（）()]*[A-Za-z][^（）()]*[）)] ?/g;
+
+/**
+ * Remove inline parallel-title citations from a PLAIN span's text. Authored body
+ * spacing is left exactly as written, so toggling never alters the spacing of
+ * unrelated CJK text; only citations and their trailing-space artifact are removed.
+ *
+ * Only called on plain spans (parallels.length === 0) when hiding is active.
+ */
+function stripParallelTitles(text: string): string {
+  return text.replace(PARALLEL_TITLE_RE, "");
+}
+
 /**
  * Split a continuous text string into alternating plain / highlighted spans
  * based on the InlineParallel ranges for the given language.
@@ -105,6 +120,9 @@ export function MainText({ className }: MainTextProps) {
     const visible = chapter.inlineParallels.filter((p) => !hidden.has(p.textId));
     return splitIntoSpans(fullText, visible, state.language);
   }, [chapter, state.language, state.hiddenTexts]);
+
+  const hideBrackets =
+    state.viewMode === "research" && state.hideParallelTitles;
 
   const handleHighlightClick = useCallback(
     (parallels: InlineParallel[], anchor: HTMLElement) => {
@@ -241,7 +259,11 @@ export function MainText({ className }: MainTextProps) {
         >
           {spans.map((span, i) => {
             if (span.parallels.length === 0) {
-              return <span key={i}>{span.text}</span>;
+              return (
+                <span key={i}>
+                  {hideBrackets ? stripParallelTitles(span.text) : span.text}
+                </span>
+              );
             }
 
             if (span.parallels.length === 1) {
