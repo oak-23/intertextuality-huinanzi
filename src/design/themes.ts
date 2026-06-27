@@ -5,11 +5,7 @@ export const normalMode: Tokens = tokens;
 
 export const researchMode: Tokens = {
   ...tokens,
-  typography: {
-    ...tokens.typography,
-    zhBody: { ...tokens.typography.zhBody, size: '16px', lineHeight: '1.6' },
-    enBody: { ...tokens.typography.enBody, size: '14px', lineHeight: '1.5' },
-  },
+  // Research mode uses the same body typography as normal mode.
   spacing: {
     ...tokens.spacing,
     mainTextMaxWidth: '840px',
