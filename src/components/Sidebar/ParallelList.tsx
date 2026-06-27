@@ -29,14 +29,20 @@ export function ParallelList({ className }: ParallelListProps) {
 
   // Group the chapter's inline parallels by source text ("the parallel title").
   // One row per source, ordered by where its first parallel appears in the text.
+  // `count` counts DISTINCT main-text locations (start:end range) so it matches
+  // the merged list length shown in the right panel.
   const groups = useMemo<TitleGroup[]>(() => {
     if (!continuousChapter) return [];
     const map = new Map<string, TitleGroup>();
+    const seenRange = new Set<string>(); // "textId:start:end"
     for (const p of continuousChapter.inlineParallels) {
       if (p.startZh < 0) continue; // builder miss => no real highlight
+      const rangeKey = `${p.textId}:${p.startZh}:${p.endZh}`;
+      const isNewLocation = !seenRange.has(rangeKey);
+      seenRange.add(rangeKey);
       const existing = map.get(p.textId);
       if (existing) {
-        existing.count += 1;
+        if (isNewLocation) existing.count += 1;
         existing.firstStart = Math.min(existing.firstStart, p.startZh);
       } else {
         const text = texts.getParallelText(p.textId);
