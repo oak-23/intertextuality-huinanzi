@@ -170,10 +170,8 @@ export function MainText({ className }: MainTextProps) {
         className="mx-auto"
         style={{
           maxWidth: "var(--main-text-max-width)",
-          padding:
-            state.viewMode === "research"
-              ? "64px 96px 96px 120px"
-              : "96px 48px 128px 48px",
+          // Research mode uses the same width/padding as normal mode.
+          padding: "96px 48px 128px 48px",
         }}
       >
         <header className="mb-12 text-center">
