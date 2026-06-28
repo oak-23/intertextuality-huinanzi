@@ -284,7 +284,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                   marginBottom: 6,
                 }}
               >
-                Researcher's Comment
+                Editor's Comment
               </h4>
               <p
                 style={{
