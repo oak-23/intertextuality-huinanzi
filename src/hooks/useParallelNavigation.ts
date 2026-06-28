@@ -40,6 +40,7 @@ export function useParallelNavigation(): UseParallelNavigationReturn {
           textId: match.textId,
           chapterId: match.chapterId,
           segmentId: match.segmentId,
+          comment: match.comment,
         });
         return true;
       }
@@ -54,6 +55,7 @@ export function useParallelNavigation(): UseParallelNavigationReturn {
         textId: parallel.textId,
         chapterId: parallel.chapterId,
         segmentId: parallel.segmentId,
+        comment: parallel.comment,
       }),
     [openParallel]
   );

@@ -9,6 +9,7 @@ export interface ParallelMatch {
   chapterId: string;
   segmentId: string;
   colorKey: ColorKey;
+  comment?: string;
 }
 
 export interface ChapterData {
@@ -102,6 +103,7 @@ export function buildChapter(data: ChapterData) {
       enMatch: p.enMatch,
       zhContext: p.zhContext,
       enContext: p.enContext,
+      comment: p.comment,
     };
   });
 

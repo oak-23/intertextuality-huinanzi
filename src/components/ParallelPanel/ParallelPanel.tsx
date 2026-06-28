@@ -132,6 +132,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
       segmentId: p.segmentId,
       contextText: p.zhContext ?? p.enContext ?? highlightText,
       highlightText,
+      comment: p.comment,
     });
     scrollToMainText(p.segmentId);
   };
@@ -263,6 +264,42 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               }}
             />
           </header>
+          
+          {panel.comment && (
+            <div
+              style={{
+                paddingLeft: "16px",
+                marginBottom: "28px",
+                borderLeft: "3px solid var(--color-border)",
+              }}
+            >
+              <h4
+                style={{
+                  fontFamily: "var(--font-ui)",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  color: "var(--color-secondary)",
+                  marginBottom: 6,
+                }}
+              >
+                Researcher's Comment
+              </h4>
+              <p
+                style={{
+                  fontFamily: lang === "zh" ? "var(--font-zh-body)" : "var(--font-en-body)",
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  color: "var(--color-secondary)",
+                  fontStyle: "italic",
+                }}
+              >
+                {panel.comment}
+              </p>
+            </div>
+          )}
+
           <div
             style={{
               fontFamily:

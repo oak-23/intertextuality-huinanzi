@@ -25,6 +25,7 @@ export interface Parallel {
   chapterId: string;
   segmentId: string;
   colorKey: ColorKey;
+  comment?: string;
 }
 
 export interface Segment {
@@ -61,6 +62,7 @@ export interface InlineParallel {
   enMatch?: string;
   zhContext?: string;
   enContext?: string;
+  comment?: string;
 }
 
 export interface ParallelOption {
@@ -72,6 +74,7 @@ export interface ParallelOption {
   enMatch?: string;
   zhContext?: string;
   enContext?: string;
+  comment?: string;
 }
 
 /** A chapter with continuous (unsegmented) text */
