@@ -3,6 +3,11 @@ import { X, ChevronLeft } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { MultiParallelPopover } from "../MainText/MultiParallelPopover";
+import {
+  LENGTH_MIN_OPEN,
+  LENGTH_MAX_OPEN,
+  withinLengthRange,
+} from "../../utils/parallelFilters";
 import type { InlineParallel, ParallelOption } from "../../types";
 // ParallelPanel reads token-defined CSS vars only — no hardcoded hex.
 
@@ -75,10 +80,18 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   // --- List mode data ---
   const listText = listTextId ? texts.getParallelText(listTextId) : null;
   const continuousChapter = texts.getContinuousChapter(state.activeChapterId);
+  const research = state.viewMode === "research";
+  const lenLo = research ? state.lengthMin : LENGTH_MIN_OPEN;
+  const lenHi = research ? state.lengthMax : LENGTH_MAX_OPEN;
   const listItems: InlineParallel[] =
     listTextId && continuousChapter
       ? continuousChapter.inlineParallels
-          .filter((p) => p.textId === listTextId && p.startZh >= 0)
+          .filter(
+            (p) =>
+              p.textId === listTextId &&
+              p.startZh >= 0 &&
+              withinLengthRange(p, lenLo, lenHi),
+          )
           .slice()
           .sort(
             (a, b) =>

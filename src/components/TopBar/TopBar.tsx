@@ -7,6 +7,7 @@ import { RhymedProseToggle } from './RhymedProseToggle';
 import { ParallelTitlesToggle } from './ParallelTitlesToggle';
 import { ChapterSelector } from './ChapterSelector';
 import { ModeSwitch } from './ModeSwitch';
+import { ResearchModeBadge } from './ResearchModeBadge';
 import { ReportButton } from './ReportButton';
 import { LoginButton } from './LoginButton';
 import { AnnotateButton } from './AnnotateButton';
@@ -42,6 +43,7 @@ export function TopBar({ className, onSearchClick }: TopBarProps) {
         >
           Intertextuality
         </span>
+        <ResearchModeBadge />
       </div>
       <div className="hidden md:flex flex-1 justify-center mx-4">
         {onSearchClick ? (

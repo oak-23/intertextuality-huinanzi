@@ -3,6 +3,11 @@ import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { useToast } from "../shared/Toast";
 import { MultiParallelPopover } from "./MultiParallelPopover";
+import {
+  LENGTH_MIN_OPEN,
+  LENGTH_MAX_OPEN,
+  withinLengthRange,
+} from "../../utils/parallelFilters";
 import type { InlineParallel, ParallelOption } from "../../types";
 
 export interface MainTextProps {
@@ -117,9 +122,21 @@ export function MainText({ className }: MainTextProps) {
     const fullText =
       state.language === "zh" ? chapter.text.zh : chapter.text.en;
     const hidden = new Set(state.hiddenTexts);
-    const visible = chapter.inlineParallels.filter((p) => !hidden.has(p.textId));
+    const research = state.viewMode === "research";
+    const lo = research ? state.lengthMin : LENGTH_MIN_OPEN;
+    const hi = research ? state.lengthMax : LENGTH_MAX_OPEN;
+    const visible = chapter.inlineParallels.filter(
+      (p) => !hidden.has(p.textId) && withinLengthRange(p, lo, hi),
+    );
     return splitIntoSpans(fullText, visible, state.language);
-  }, [chapter, state.language, state.hiddenTexts]);
+  }, [
+    chapter,
+    state.language,
+    state.hiddenTexts,
+    state.viewMode,
+    state.lengthMin,
+    state.lengthMax,
+  ]);
 
   const hideBrackets =
     state.viewMode === "research" && state.hideParallelTitles;
