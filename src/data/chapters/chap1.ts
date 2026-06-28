@@ -15,7 +15,6 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-tiandi",
       segmentId: "zz-tia-01",
       colorKey: "zhuangzi",
-      comment: "Researcher's Comment: This section highlights the importance of the Dao covering and carrying everything.",
     },
     {
       zhContext:
