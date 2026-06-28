@@ -158,6 +158,7 @@ export function MainText({ className }: MainTextProps) {
           segmentId: p.segmentId,
           contextText: p.zhContext ?? p.enContext ?? highlightText,
           highlightText,
+          comment: p.comment,
         });
         show(
           `Opened parallel in ${texts.getParallelText(p.textId)?.title.en ?? p.textId}`,
@@ -182,6 +183,7 @@ export function MainText({ className }: MainTextProps) {
             enMatch: p.enMatch,
             zhContext: p.zhContext,
             enContext: p.enContext,
+            comment: p.comment,
           })),
         );
         setMultiAnchor(anchor);
@@ -400,6 +402,7 @@ export function MainText({ className }: MainTextProps) {
               (state.language === "zh" ? p.zhContext : p.enContext) ??
               highlightText,
             highlightText,
+            comment: p.comment,
           });
           show(
             `Opened parallel in ${texts.getParallelText(p.textId)?.title.en ?? p.textId}`,

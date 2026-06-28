@@ -15,6 +15,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-tiandi",
       segmentId: "zz-tia-01",
       colorKey: "zhuangzi",
+      comment: "Researcher's Comment: This section highlights the importance of the Dao covering and carrying everything.",
     },
     {
       zhContext:
@@ -86,6 +87,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-tiandi",
       segmentId: "zz-tia-02",
       colorKey: "zhuangzi",
+      comment: "We pick the “Tiandi” as the most likely source since the continuation of the Huainanzi passage contains more parallels with “Tiandi”."
     },
     {
       zhContext:
@@ -187,6 +189,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-gengsangchu",
       segmentId: "zz-gsc-01",
       colorKey: "zhuangzi",
+      comment: "Or it is a parallel with the Han Feizi."
     },
     {
       zhContext:
@@ -247,6 +250,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-keyi",
       segmentId: "zz-keyi-03",
       colorKey: "zhuangzi",
+      comment: "The Zhuangzi “Keyi” chapter is the only other text that uses this expression."
     },
     {
       zhContext:
@@ -317,6 +321,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-zhibeiyou",
       segmentId: "zz-zby-02",
       colorKey: "zhuangzi",
+      comment: "It is a textual parallel with the Zhuangzi, and the Zhuangzi passage alludes to Laozi 14 and 35."
     },
     {
       zhContext:
@@ -356,6 +361,7 @@ export const chap1Data: ChapterData = {
       chapterId: "laozi-20",
       segmentId: "lz-20-01",
       colorKey: "laozi",
+      comment: "This type of sentence structure only appears in these Laozi passages."
     },
     {
       zhContext:
@@ -366,6 +372,7 @@ export const chap1Data: ChapterData = {
       chapterId: "zz-zhibeiyou",
       segmentId: "zz-zby-03",
       colorKey: "zhuangzi",
+      comment: "It is probably a reference to the Guanzi’s “Bingfa” chapter."
     },
     {
       zhContext:

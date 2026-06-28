@@ -16,6 +16,7 @@ export interface ParallelPanelState {
   segmentId: string;
   contextText?: string;
   highlightText?: string;
+  comment?: string;
 }
 
 export interface SearchState {
