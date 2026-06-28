@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Language, DisplayMode, ViewMode, SearchScope } from "../types";
+import { LENGTH_MIN_OPEN, LENGTH_MAX_OPEN } from "../utils/parallelFilters";
 
 export interface ParallelPanelState {
   textId: string;
@@ -48,6 +49,10 @@ export interface AppState {
   parallelListTextId: string | null;
   /** When true (research mode only), bracketed parallel-title citations are hidden in the main text. */
   hideParallelTitles: boolean;
+  /** Research-mode length filter: only parallels whose Chinese-character span is
+   * within [lengthMin, lengthMax] are highlighted/listed. Open sentinels = no limit. */
+  lengthMin: number;
+  lengthMax: number;
 }
 
 export type AppAction =
@@ -72,7 +77,8 @@ export type AppAction =
   | { type: "TOGGLE_PARALLEL_TITLES" }
   | { type: "OPEN_PARALLEL_LIST"; textId: string }
   | { type: "OPEN_PARALLEL_IN_LIST"; panel: ParallelPanelState }
-  | { type: "CLOSE_PARALLEL_LIST" };
+  | { type: "CLOSE_PARALLEL_LIST" }
+  | { type: "SET_LENGTH_RANGE"; min: number; max: number };
 
 export const initialAppState: AppState = {
   language: "zh",
@@ -90,6 +96,8 @@ export const initialAppState: AppState = {
   hiddenTexts: [],
   parallelListTextId: null,
   hideParallelTitles: false,
+  lengthMin: LENGTH_MIN_OPEN,
+  lengthMax: LENGTH_MAX_OPEN,
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -190,6 +198,8 @@ function reducer(state: AppState, action: AppAction): AppState {
       };
     case "TOGGLE_PARALLEL_TITLES":
       return { ...state, hideParallelTitles: !state.hideParallelTitles };
+    case "SET_LENGTH_RANGE":
+      return { ...state, lengthMin: action.min, lengthMax: action.max };
     default:
       return state;
   }
@@ -216,6 +226,7 @@ export interface AppContextValue {
   openParallelList: (textId: string) => void;
   openParallelInList: (panel: ParallelPanelState) => void;
   closeParallelList: () => void;
+  setLengthRange: (min: number, max: number) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -302,6 +313,11 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
     () => dispatch({ type: "CLOSE_PARALLEL_LIST" }),
     [],
   );
+  const setLengthRange = useCallback(
+    (min: number, max: number) =>
+      dispatch({ type: "SET_LENGTH_RANGE", min, max }),
+    [],
+  );
 
   const value = useMemo<AppContextValue>(
     () => ({
@@ -324,6 +340,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       openParallelList,
       openParallelInList,
       closeParallelList,
+      setLengthRange,
     }),
     [
       state,
@@ -344,6 +361,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       openParallelList,
       openParallelInList,
       closeParallelList,
+      setLengthRange,
     ],
   );
 

@@ -1,5 +1,6 @@
 import { useApp } from '../../context/AppContext';
 import { ParallelList } from './ParallelList';
+import { ParallelLengthFilter } from './ParallelLengthFilter';
 
 export interface SidebarProps {
   className?: string;
@@ -53,6 +54,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
 
       </div>
+      <ParallelLengthFilter />
       <ParallelList />
     </nav>
   );
