@@ -778,8 +778,8 @@ const lushichunqiu: Text = {
       id: "lsc-zhizhong",
       title: { zh: "志忠", en: "Zhizhong" },
       segments: [
-        { id: "lsc-zz-01", content: { zh: "三日三夜", en: "" } },
-        { id: "lsc-zz-r01", content: { zh: "三日三夜", en: "" } },
+        { id: "lsc-zz-01", content: { zh: "三日三夜，顏色不變", en: "" } },
+        { id: "lsc-zz-r01", content: { zh: "三日三夜，顏色不變", en: "" } },
       ],
     },
   ],

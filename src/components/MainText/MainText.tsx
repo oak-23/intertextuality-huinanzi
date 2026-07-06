@@ -311,7 +311,7 @@ export function MainText({ className }: MainTextProps) {
               display: "inline",
             }}
           >
-            {span.text}
+            {isProseZh ? localizeParallelTitles(span.text) : span.text}
           </span>
           {fn !== undefined && (
             <sup aria-hidden style={footnoteSupStyle}>
