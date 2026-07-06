@@ -323,13 +323,14 @@ export function MainText({ className }: MainTextProps) {
     }
 
     const chars = Array.from(span.text);
-    const chunkSize = Math.max(
-      1,
-      Math.ceil(chars.length / span.parallels.length),
-    );
+    const n = span.parallels.length;
     const chunks = [];
-    for (let j = 0; j < span.parallels.length; j++) {
-      const text = chars.slice(j * chunkSize, (j + 1) * chunkSize).join("");
+    for (let j = 0; j < n; j++) {
+      // Even partition so every parallel gets a slice (and its color) when
+      // the span has at least as many characters as parallels.
+      const start = Math.round((j * chars.length) / n);
+      const end = Math.round(((j + 1) * chars.length) / n);
+      const text = chars.slice(start, end).join("");
       if (text) {
         chunks.push({ text, parallel: span.parallels[j] });
       }
