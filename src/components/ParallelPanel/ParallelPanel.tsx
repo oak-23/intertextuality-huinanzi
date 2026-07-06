@@ -258,7 +258,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               className="font-serif"
               style={{
                 fontSize: 32,
-                fontWeight: 700,
+                fontFamily: "var(--font-zh-body)",
+                fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.2,
                 marginBottom: chapter ? 16 : 12,
@@ -273,7 +274,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                   className="font-serif"
                   style={{
                     fontSize: 24,
-                    fontWeight: 600,
+                    fontFamily: "var(--font-zh-body)",
+                    fontWeight: 400,
                     letterSpacing: "-0.01em",
                     color: "var(--color-text-primary)",
                   }}
@@ -401,7 +403,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               className="font-serif"
               style={{
                 fontSize: 32,
-                fontWeight: 700,
+                fontFamily: "var(--font-zh-body)",
+                fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.2,
                 marginBottom: 8,
