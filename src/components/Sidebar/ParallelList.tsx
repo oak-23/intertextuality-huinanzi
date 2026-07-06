@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
+import { useRhymedView } from "../../hooks/useRhymedView";
 import { ParallelListItem } from "./ParallelListItem";
 import {
   LENGTH_MIN_OPEN,
@@ -25,12 +26,8 @@ interface TitleGroup {
 export function ParallelList({ className }: ParallelListProps) {
   const { texts } = useRepositories();
   const { state, openParallelList, toggleTextHighlight } = useApp();
-  const language = state.language;
 
-  const continuousChapter = useMemo(
-    () => texts.getContinuousChapter(state.activeChapterId),
-    [texts, state.activeChapterId],
-  );
+  const { chapter: continuousChapter, activeParallels } = useRhymedView();
 
   // Group the chapter's inline parallels by source text ("the parallel title").
   // One row per source, ordered by where its first parallel appears in the text.
@@ -43,7 +40,7 @@ export function ParallelList({ className }: ParallelListProps) {
     const hi = research ? state.lengthMax : LENGTH_MAX_OPEN;
     const map = new Map<string, TitleGroup>();
     const seenRange = new Set<string>(); // "textId:start:end"
-    for (const p of continuousChapter.inlineParallels) {
+    for (const p of activeParallels) {
       if (p.startZh < 0) continue; // builder miss => no real highlight
       if (!withinLengthRange(p, lo, hi)) continue; // outside length filter
       const rangeKey = `${p.textId}:${p.startZh}:${p.endZh}`;
@@ -68,6 +65,7 @@ export function ParallelList({ className }: ParallelListProps) {
     return [...map.values()].sort((a, b) => a.firstStart - b.firstStart);
   }, [
     continuousChapter,
+    activeParallels,
     texts,
     state.viewMode,
     state.lengthMin,
@@ -89,7 +87,6 @@ export function ParallelList({ className }: ParallelListProps) {
                 titleZh={g.titleZh}
                 titleEn={g.titleEn}
                 count={g.count}
-                language={language}
                 isActive={isActive}
                 isOn={!state.hiddenTexts.includes(g.textId)}
                 onOpen={() => openParallelList(g.textId)}

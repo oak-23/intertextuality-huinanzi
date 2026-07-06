@@ -78,7 +78,7 @@ export function useGlobalSearch() {
       entries.push({
         kind: 'text',
         label: pText.title.zh,
-        sublabel: pText.title.en,
+        sublabel: pText.title.zh,
         textId: pText.id,
         chapterId: pText.chapters[0]?.id ?? '',
         colorKey: pText.colorKey,
@@ -89,7 +89,7 @@ export function useGlobalSearch() {
         entries.push({
           kind: 'chapter',
           label: chapter.title.zh,
-          sublabel: `${pText.title.en} · ${chapter.title.en}`,
+          sublabel: `${pText.title.zh} · ${chapter.title.zh}`,
           textId: pText.id,
           chapterId: chapter.id,
           colorKey: pText.colorKey,

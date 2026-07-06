@@ -13,7 +13,11 @@ export type ColorKey =
   | "shanhaijing"
   | "shiji"
   | "xunzi"
-  | "liji";
+  | "liji"
+  | "shenzi"
+  | "zhanguoce"
+  | "lunyu"
+  | "mengzi";
 
 export interface BiLingual {
   zh: string;
@@ -61,6 +65,10 @@ export interface InlineParallel {
   enMatch?: string;
   zhContext?: string;
   enContext?: string;
+  zhContextRanges?: [number, number][];
+  noteEn?: string;
+  /** Docx footnote display number (1-based) for this parallel's unit */
+  footnote?: number;
 }
 
 export interface ParallelOption {
@@ -72,6 +80,27 @@ export interface ParallelOption {
   enMatch?: string;
   zhContext?: string;
   enContext?: string;
+  zhContextRanges?: [number, number][];
+  noteEn?: string;
+}
+
+/** One line of the rhymed version with its scholarly annotations */
+export interface RhymedLine {
+  zh: string;
+  /** Old Chinese rhyme-group label, e.g. 職, 耕平 */
+  rhyme?: string;
+  /** Rhyme-unit number, e.g. 1.1, 2.15 */
+  unit?: string;
+  /** Editorial marker, e.g. A */
+  marker?: string;
+}
+
+/** The rhymed version of a chapter (research mode) */
+export interface RhymedContent {
+  /** Line texts joined with \n; parallel offsets index into this string */
+  text: string;
+  lines: RhymedLine[];
+  inlineParallels: InlineParallel[];
 }
 
 /** A chapter with continuous (unsegmented) text */
@@ -82,6 +111,8 @@ export interface ContinuousChapter {
   text: BiLingual;
   /** Inline highlight ranges referencing parallels */
   inlineParallels: InlineParallel[];
+  /** Optional rhymed version, viewable in research mode */
+  rhymed?: RhymedContent;
 }
 
 /** A text with continuous (unsegmented) chapters */

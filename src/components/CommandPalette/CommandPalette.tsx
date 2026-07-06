@@ -83,6 +83,41 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     el?.scrollIntoView({ block: 'nearest' });
   }, [activeIdx]);
 
+  /** Open a parallel with its inline context/highlights/note when the segment
+   *  is referenced by a parallel in the main text (prose or rhymed). */
+  const openParallelWithContext = useCallback(
+    (textId: string, chapterId: string, segmentId: string) => {
+      let inline;
+      for (const ch of texts.getMainContinuousText()?.chapters ?? []) {
+        inline =
+          ch.inlineParallels.find(
+            (p) =>
+              p.textId === textId &&
+              p.chapterId === chapterId &&
+              p.segmentId === segmentId,
+          ) ??
+          ch.rhymed?.inlineParallels.find(
+            (p) =>
+              p.textId === textId &&
+              p.chapterId === chapterId &&
+              p.segmentId === segmentId,
+          );
+        if (inline) break;
+      }
+      const seg = texts.getSegment(textId, chapterId, segmentId);
+      openParallel({
+        textId,
+        chapterId,
+        segmentId,
+        contextText: inline?.zhContext,
+        highlightText: seg?.content.zh,
+        highlightRanges: inline?.zhContextRanges,
+        noteEn: inline?.noteEn,
+      });
+    },
+    [texts, openParallel],
+  );
+
   const handleSelect = useCallback(
     (result: GlobalSearchResult) => {
       if (result.isMain) {
@@ -100,21 +135,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       } else {
         // For parallel texts/chapters/segments: open the parallel panel
         if (result.kind === 'segment' && result.segmentId) {
-          openParallel({
-            textId: result.textId,
-            chapterId: result.chapterId,
-            segmentId: result.segmentId,
-          });
+          openParallelWithContext(result.textId, result.chapterId, result.segmentId);
         } else if (result.kind === 'chapter') {
           // Open first segment of the chapter in parallel panel
           const chapter = texts.getParallelChapter(result.textId, result.chapterId);
           const firstSeg = chapter?.segments[0];
           if (firstSeg) {
-            openParallel({
-              textId: result.textId,
-              chapterId: result.chapterId,
-              segmentId: firstSeg.id,
-            });
+            openParallelWithContext(result.textId, result.chapterId, firstSeg.id);
           }
         } else if (result.kind === 'text') {
           // Open first segment of first chapter in parallel panel
@@ -122,17 +149,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           const firstChapter = pText?.chapters[0];
           const firstSeg = firstChapter?.segments[0];
           if (firstChapter && firstSeg) {
-            openParallel({
-              textId: result.textId,
-              chapterId: firstChapter.id,
-              segmentId: firstSeg.id,
-            });
+            openParallelWithContext(result.textId, firstChapter.id, firstSeg.id);
           }
         }
       }
       onClose();
     },
-    [state.activeChapterId, switchChapter, selectSegment, openParallel, onClose, texts, pulse, openParallelNav]
+    [state.activeChapterId, switchChapter, selectSegment, openParallelWithContext, onClose, texts, pulse, openParallelNav]
   );
 
   const onKeyDown = useCallback(
@@ -302,7 +325,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                           size={14}
                           style={{
                             color: result.colorKey
-                              ? `var(--color-dot-${result.colorKey})`
+                              ? `var(--color-highlight-${result.colorKey})`
                               : 'var(--color-secondary)',
                           }}
                         />

@@ -1,4 +1,4 @@
-import type { ColorKey, Language } from "../../types";
+import type { ColorKey } from "../../types";
 import { Toggle } from "../shared/Toggle";
 
 export interface ParallelListItemProps {
@@ -6,7 +6,6 @@ export interface ParallelListItemProps {
   titleZh: string;
   titleEn: string;
   count: number;
-  language: Language;
   isActive: boolean;
   isOn: boolean;
   onOpen: () => void;
@@ -18,14 +17,11 @@ export function ParallelListItem({
   titleZh,
   titleEn,
   count,
-  language,
   isActive,
   isOn,
   onOpen,
   onToggle,
 }: ParallelListItemProps) {
-  const primary = language === "zh" ? titleZh : titleEn;
-  const subtitle = language === "zh" ? titleEn : titleZh;
   const dim = isOn ? 1 : 0.45;
 
   return (
@@ -67,7 +63,7 @@ export function ParallelListItem({
           width: 8,
           height: 8,
           borderRadius: 9999,
-          backgroundColor: `var(--color-dot-${colorKey})`,
+          backgroundColor: `var(--color-highlight-${colorKey})`,
           opacity: dim,
           flexShrink: 0,
         }}
@@ -82,7 +78,7 @@ export function ParallelListItem({
             color: "var(--color-text-primary)",
           }}
         >
-          {primary}
+          {titleZh}
         </span>
         <span
           className="truncate"
@@ -92,7 +88,7 @@ export function ParallelListItem({
             color: "var(--color-muted)",
           }}
         >
-          {subtitle} · {count}
+          {count}
         </span>
       </span>
       <span

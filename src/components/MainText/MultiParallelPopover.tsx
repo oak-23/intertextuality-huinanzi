@@ -46,9 +46,7 @@ export function MultiParallelPopover({
           if (!text) return null;
           const chapter = text.chapters.find((c) => c.id === p.chapterId);
           const chapterTitleZh = chapter?.title.zh || p.chapterId;
-          const chapterTitleEn = chapter?.title.en || p.chapterId;
           const textTitleZh = text.title.zh || p.textId;
-          const textTitleEn = text.title.en || p.textId;
           return (
             <button
               key={`${p.textId}-${i}`}
@@ -65,7 +63,7 @@ export function MultiParallelPopover({
                   width: 8,
                   height: 8,
                   borderRadius: 9999,
-                  backgroundColor: `var(--color-dot-${p.colorKey})`,
+                  backgroundColor: `var(--color-highlight-${p.colorKey})`,
                   flexShrink: 0,
                 }}
               />
@@ -81,19 +79,9 @@ export function MultiParallelPopover({
                 >
                   {textTitleZh}
                 </span>
-                <span
-                  className="block mt-0.5 italic"
-                  style={{
-                    fontFamily: "var(--font-ui)",
-                    fontSize: 12,
-                    color: "var(--color-muted)",
-                  }}
-                >
-                  {textTitleEn}
-                </span>
               </span>
               <span
-                className="shrink-0 text-right flex flex-col items-end"
+                className="shrink-0 text-right"
                 style={{
                   width: 96,
                   fontFamily: "var(--font-ui)",
@@ -101,23 +89,7 @@ export function MultiParallelPopover({
                   color: "var(--color-muted)",
                 }}
               >
-                <span className="block">{chapterTitleZh}</span>
-                {chapterTitleEn ? (
-                  <span
-                    className="block mt-0.5"
-                    style={{
-                      display: "-webkit-box",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      WebkitBoxOrient: "vertical",
-                      WebkitLineClamp: 2,
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {`"${chapterTitleEn}"`}
-                  </span>
-                ) : null}
+                {chapterTitleZh}
               </span>
             </button>
           );

@@ -65,8 +65,8 @@ export default {
         topbar: 'var(--top-bar-height)',
       },
       fontFamily: {
-        zh: ['"Noto Serif SC"', 'serif'],
-        serif: ['"Noto Serif SC"', 'serif'],
+        zh: ['"PMingLiU"', '"PMingLiU-ExtB"', '"新細明體"', '"Noto Serif TC"', '"Jigmo"', 'serif'],
+        serif: ['"PMingLiU"', '"PMingLiU-ExtB"', '"新細明體"', '"Noto Serif TC"', '"Jigmo"', 'serif'],
         sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'],
       },
       fontSize: {

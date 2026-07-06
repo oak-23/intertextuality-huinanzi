@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useApp } from '../context/AppContext';
-import { useRepositories } from '../context/RepositoryContext';
+import { useRhymedView } from './useRhymedView';
 import type { Parallel } from '../types';
 
 export interface UseParallelNavigationReturn {
@@ -15,26 +15,19 @@ export interface UseParallelNavigationReturn {
 }
 
 export function useParallelNavigation(): UseParallelNavigationReturn {
-  const { state, openParallel, closeParallel } = useApp();
-  const { texts } = useRepositories();
-
-  const continuousChapter = useMemo(
-    () => texts.getContinuousChapter(state.activeChapterId),
-    [texts, state.activeChapterId]
-  );
+  const { openParallel, closeParallel } = useApp();
+  const { activeParallels } = useRhymedView();
 
   const textHasParallelsInActiveChapter = useCallback(
     (textId: string) => {
-      if (!continuousChapter) return false;
-      return continuousChapter.inlineParallels.some((p) => p.textId === textId);
+      return activeParallels.some((p) => p.textId === textId);
     },
-    [continuousChapter]
+    [activeParallels]
   );
 
   const openParallelForFirstMatch = useCallback(
     (textId: string) => {
-      if (!continuousChapter) return false;
-      const match = continuousChapter.inlineParallels.find((p) => p.textId === textId);
+      const match = activeParallels.find((p) => p.textId === textId);
       if (match) {
         openParallel({
           textId: match.textId,
@@ -45,7 +38,7 @@ export function useParallelNavigation(): UseParallelNavigationReturn {
       }
       return false;
     },
-    [continuousChapter, openParallel]
+    [activeParallels, openParallel]
   );
 
   const open = useCallback(

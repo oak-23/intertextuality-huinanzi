@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 /*
+ * Rare-glyph fallback webfont (Jigmo, CC0 1.0, https://kamichikoichi.github.io/jigmo/).
+ * Subset to exactly the 104 CJK codepoints in the app's text that are not covered
+ * by the self-hosted Noto Serif TC. See scripts/subset-rare-glyphs.md.
+ */
+@font-face {
+  font-family: "Jigmo";
+  src: url("/fonts/Jigmo-subset.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+366C, U+3A4C, U+3B86, U+3E60, U+405F, U+40E3, U+40FA, U+49FF, U+50D3, U+513D, U+547A, U+54B6, U+5646, U+582E, U+5CD7, U+5D41, U+5E4E, U+5E6D, U+60FE, U+6179, U+62AE, U+630F, U+6356, U+6513, U+69E2, U+6A51, U+6B7E, U+6BB0, U+6BC8, U+6C52, U+6DBD, U+6EC0, U+703F, U+7056, U+72F6, U+7335, U+734A, U+75CF, U+76A6, U+7739, U+7767, U+776F, U+7928, U+7A7D, U+7ABD, U+7C83, U+7D6F, U+7E72, U+7FE3, U+80C8, U+82FD, U+8442, U+8530, U+85B6, U+8689, U+8691, U+86B7, U+870B, U+8733, U+874D, U+8771, U+87B4, U+87C1, U+8809, U+880F, U+8829, U+89DF, U+89E1, U+8A99, U+8B37, U+8C88, U+8D15, U+8D8E, U+8E36, U+8E6A, U+8EA0, U+91B7, U+940D, U+962C, U+96DA, U+97BC, U+982F, U+98C2, U+9958, U+99F4, U+9AAD, U+9AE2, U+9C0C, U+9D33, U+9D82, U+9DEB, U+9F03, U+9F2A, U+9F55;
+}
+@font-face {
+  font-family: "Jigmo";
+  src: url("/fonts/Jigmo2-subset.woff2") format("woff2");
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+2073E, U+22D8A, U+24162, U+24D2F, U+2627E, U+27483, U+2764D, U+280E8, U+2940B, U+2A2A8;
+}
+
+/*
  * Tokens are written by ThemeContext on viewMode change.
  * Defaults here mirror src/design/tokens.ts so the page renders sanely
  * before React hydrates.
@@ -65,7 +85,7 @@
   --shadow-modal: 0 4px 24px rgba(0, 0, 0, 0.12);
   --shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-  --font-zh-body: 'Noto Serif SC', serif;
+  --font-zh-body: 'PMingLiU', 'PMingLiU-ExtB', '新細明體', 'Noto Serif TC', 'Jigmo', serif;
   --font-en-body: 'Noto Serif SC', serif;
   --font-ui: 'Inter', -apple-system, system-ui, sans-serif;
 

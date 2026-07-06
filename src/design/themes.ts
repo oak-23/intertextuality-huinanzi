@@ -20,7 +20,13 @@ const COLOR_KEYS: Array<keyof Tokens['color']['dot']> = [
   'laozi',
   'zhuangzi',
   'xunzi',
-  'liji'
+  'liji',
+  'shenzi',
+  'hanfeizi',
+  'zhanguoce',
+  'lunyu',
+  'mengzi',
+  'guanzi'
 ];
 
 /**

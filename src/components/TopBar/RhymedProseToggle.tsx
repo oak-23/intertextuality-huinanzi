@@ -1,5 +1,5 @@
 import { useApp } from '../../context/AppContext';
-import { useRepositories } from '../../context/RepositoryContext';
+import { useRhymedView } from '../../hooks/useRhymedView';
 import { useToast } from '../shared/Toast';
 
 export interface RhymedProseToggleProps {
@@ -8,23 +8,20 @@ export interface RhymedProseToggleProps {
 
 export function RhymedProseToggle({ className }: RhymedProseToggleProps) {
   const { state, setDisplayMode } = useApp();
-  const { texts } = useRepositories();
+  const { available } = useRhymedView();
   const { show } = useToast();
 
   if (state.viewMode !== 'research') return null;
 
   const flip = () => {
     const next = state.displayMode === 'rhymed' ? 'prose' : 'rhymed';
-    if (next === 'rhymed') {
-      const chapter = texts.getChapter(state.activeChapterId);
-      const hasRhyme = chapter?.segments.some(
-        (s) =>
-          (state.language === 'zh' ? s.content.zhRhymed : s.content.enRhymed) !== undefined
+    if (next === 'rhymed' && !available) {
+      show(
+        state.language === 'zh'
+          ? 'Rhymed version not available for this chapter.'
+          : 'Rhymed version is only available for the Chinese text.'
       );
-      if (!hasRhyme) {
-        show('Rhymed version not available for this chapter.');
-        return;
-      }
+      return;
     }
     setDisplayMode(next);
   };

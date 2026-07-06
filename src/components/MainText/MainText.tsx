@@ -1,6 +1,8 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, Fragment } from "react";
+import type { CSSProperties } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
+import { useRhymedView } from "../../hooks/useRhymedView";
 import { useToast } from "../shared/Toast";
 import { MultiParallelPopover } from "./MultiParallelPopover";
 import {
@@ -8,7 +10,8 @@ import {
   LENGTH_MAX_OPEN,
   withinLengthRange,
 } from "../../utils/parallelFilters";
-import type { InlineParallel, ParallelOption } from "../../types";
+import { normalizeCitationKey, citationZhByKey } from "../../data/citationTitles";
+import type { InlineParallel, ParallelOption, RhymedLine } from "../../types";
 
 export interface MainTextProps {
   className?: string;
@@ -29,6 +32,9 @@ interface TextSpan {
  * content has ≥1 Latin letter and no nested parens, closed by ） or ). */
 const PARALLEL_TITLE_RE = /（[^（）()]*[A-Za-z][^（）()]*[）)] ?/g;
 
+/** Matches a rhymed-version citation, e.g. 《老子・第六十六章》. */
+const RHYMED_TITLE_RE = /《[^《》]*》/g;
+
 /**
  * Remove inline parallel-title citations from a PLAIN span's text. Authored body
  * spacing is left exactly as written, so toggling never alters the spacing of
@@ -37,7 +43,23 @@ const PARALLEL_TITLE_RE = /（[^（）()]*[A-Za-z][^（）()]*[）)] ?/g;
  * Only called on plain spans (parallels.length === 0) when hiding is active.
  */
 function stripParallelTitles(text: string): string {
-  return text.replace(PARALLEL_TITLE_RE, "");
+  return text.replace(PARALLEL_TITLE_RE, "").replace(RHYMED_TITLE_RE, "");
+}
+
+/**
+ * Replace （romanized-citation） markers in a PLAIN prose zh span with their
+ * Chinese 《…》 equivalents from citationZhByKey. Unmapped citations are left
+ * verbatim (including their trailing-space artifact). Called only in the prose
+ * zh path when hideBrackets is false; rhymed lines and the 'en' path are
+ * never touched.
+ */
+function localizeParallelTitles(text: string): string {
+  return text.replace(PARALLEL_TITLE_RE, (match) => {
+    // Strip the leading （ and the closing ）/) plus optional trailing space
+    const inner = match.slice(1).replace(/[）)] ?$/, "");
+    const zh = citationZhByKey[normalizeCitationKey(inner)];
+    return zh ?? match;
+  });
 }
 
 /**
@@ -108,6 +130,7 @@ export function MainText({ className }: MainTextProps) {
   const { state, openParallel } = useApp();
   const { texts } = useRepositories();
   const { show } = useToast();
+  const { rhymed, active: rhymedActive } = useRhymedView();
 
   const [multiAnchor, setMultiAnchor] = useState<HTMLElement | null>(null);
   const [multiParallels, setMultiParallels] = useState<ParallelOption[]>([]);
@@ -118,7 +141,7 @@ export function MainText({ className }: MainTextProps) {
     null;
 
   const spans = useMemo(() => {
-    if (!chapter) return [];
+    if (!chapter || rhymedActive) return [];
     const fullText =
       state.language === "zh" ? chapter.text.zh : chapter.text.en;
     const hidden = new Set(state.hiddenTexts);
@@ -131,9 +154,48 @@ export function MainText({ className }: MainTextProps) {
     return splitIntoSpans(fullText, visible, state.language);
   }, [
     chapter,
+    rhymedActive,
     state.language,
     state.hiddenTexts,
     state.viewMode,
+    state.lengthMin,
+    state.lengthMax,
+  ]);
+
+  /** Rhymed view: per-line spans plus the line's rhyme annotations. */
+  const rhymedRows = useMemo(() => {
+    if (!rhymedActive || !rhymed) return null;
+    const hidden = new Set(state.hiddenTexts);
+    const lo = state.lengthMin;
+    const hi = state.lengthMax;
+    const visible = rhymed.inlineParallels.filter(
+      (p) =>
+        p.startZh >= 0 &&
+        !hidden.has(p.textId) &&
+        withinLengthRange(p, lo, hi),
+    );
+    const rows: { line: RhymedLine; spans: TextSpan[] }[] = [];
+    let offset = 0;
+    for (const line of rhymed.lines) {
+      const start = offset;
+      const end = offset + line.zh.length;
+      const clipped = visible
+        .filter((p) => p.startZh < end && p.endZh > start)
+        .map((p) => ({
+          ...p,
+          startZh: Math.max(p.startZh, start) - start,
+          endZh: Math.min(p.endZh, end) - start,
+          // Show footnote only on the line where the parallel ends
+          footnote: p.endZh <= end ? p.footnote : undefined,
+        }));
+      rows.push({ line, spans: splitIntoSpans(line.zh, clipped, "zh") });
+      offset = end + 1; // the \n separator
+    }
+    return rows;
+  }, [
+    rhymedActive,
+    rhymed,
+    state.hiddenTexts,
     state.lengthMin,
     state.lengthMax,
   ]);
@@ -158,9 +220,11 @@ export function MainText({ className }: MainTextProps) {
           segmentId: p.segmentId,
           contextText: p.zhContext ?? p.enContext ?? highlightText,
           highlightText,
+          highlightRanges: p.zhContextRanges,
+          noteEn: p.noteEn,
         });
         show(
-          `Opened parallel in ${texts.getParallelText(p.textId)?.title.en ?? p.textId}`,
+          `Opened parallel in ${texts.getParallelText(p.textId)?.title.zh ?? p.textId}`,
           1800,
         );
       } else {
@@ -182,6 +246,8 @@ export function MainText({ className }: MainTextProps) {
             enMatch: p.enMatch,
             zhContext: p.zhContext,
             enContext: p.enContext,
+            zhContextRanges: p.zhContextRanges,
+            noteEn: p.noteEn,
           })),
         );
         setMultiAnchor(anchor);
@@ -195,6 +261,169 @@ export function MainText({ className }: MainTextProps) {
   }
 
   const chapterTitle = chapter.title;
+
+  /** Render one text span (plain, single-parallel, or multi-parallel).
+   *  Pass isProseZh=true only from the prose (non-rhymed) zh render path to
+   *  enable citation localization; rhymed lines and the 'en' path must not pass it. */
+  const renderSpan = (span: TextSpan, i: number, isProseZh = false) => {
+    if (span.parallels.length === 0) {
+      const displayText = hideBrackets
+        ? stripParallelTitles(span.text)
+        : isProseZh
+          ? localizeParallelTitles(span.text)
+          : span.text;
+      return <span key={i}>{displayText}</span>;
+    }
+
+    const footnoteSupStyle: CSSProperties = {
+      fontFamily: "var(--font-ui)",
+      fontSize: `calc(12px * ${state.zoomLevel})`,
+      color: "var(--color-secondary)",
+      userSelect: "none",
+      marginLeft: 2,
+      lineHeight: 1,
+      verticalAlign: "super",
+    };
+
+    if (span.parallels.length === 1) {
+      const fn = span.parallels[0].footnote;
+      return (
+        <Fragment key={i}>
+          <span
+            data-parallel-ids={span.parallels[0].segmentId}
+            className="scroll-anchor"
+            onClick={(e) =>
+              handleHighlightClick(span.parallels, e.currentTarget)
+            }
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.filter =
+                "brightness(0.97)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.filter = "";
+            }}
+            style={{
+              background: `var(--color-highlight-${span.parallels[0].colorKey})`,
+              padding: "2px 4px",
+              borderRadius: "var(--radius-sm)",
+              cursor: "pointer",
+              transition: "filter 150ms ease, box-shadow 150ms ease",
+              display: "inline",
+            }}
+          >
+            {span.text}
+          </span>
+          {fn !== undefined && (
+            <sup aria-hidden style={footnoteSupStyle}>
+              {fn}
+            </sup>
+          )}
+        </Fragment>
+      );
+    }
+
+    const chars = Array.from(span.text);
+    const chunkSize = Math.max(
+      1,
+      Math.ceil(chars.length / span.parallels.length),
+    );
+    const chunks = [];
+    for (let j = 0; j < span.parallels.length; j++) {
+      const text = chars.slice(j * chunkSize, (j + 1) * chunkSize).join("");
+      if (text) {
+        chunks.push({ text, parallel: span.parallels[j] });
+      }
+    }
+
+    const uniqueFootnotes = [
+      ...new Set(
+        span.parallels
+          .map((p) => p.footnote)
+          .filter((n): n is number => n !== undefined),
+      ),
+    ];
+    const footnoteLabel =
+      uniqueFootnotes.length > 0 ? uniqueFootnotes.join(",") : null;
+
+    return (
+      <Fragment key={i}>
+        <span
+          data-parallel-ids={span.parallels.map((p) => p.segmentId).join(" ")}
+          className="scroll-anchor"
+          style={{
+            display: "inline",
+          }}
+        >
+          {chunks.map((chunk, j) => (
+            <span
+              key={j}
+              onClick={(e) =>
+                handleHighlightClick(span.parallels, e.currentTarget)
+              }
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.filter =
+                  "brightness(0.97)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.filter = "";
+              }}
+              style={{
+                background: `var(--color-highlight-${chunk.parallel.colorKey})`,
+                paddingTop: 2,
+                paddingBottom: 2,
+                paddingLeft: j === 0 ? 4 : 0,
+                paddingRight: j === chunks.length - 1 ? 4 : 0,
+                borderRadius:
+                  j === 0 && j === chunks.length - 1
+                    ? "var(--radius-sm)"
+                    : j === 0
+                      ? "var(--radius-sm) 0 0 var(--radius-sm)"
+                      : j === chunks.length - 1
+                        ? "0 var(--radius-sm) var(--radius-sm) 0"
+                        : 0,
+                cursor: "pointer",
+                transition: "filter 150ms ease, box-shadow 150ms ease",
+              }}
+            >
+              {chunk.text}
+            </span>
+          ))}
+        </span>
+        {footnoteLabel !== null && (
+          <sup aria-hidden style={footnoteSupStyle}>
+            {footnoteLabel}
+          </sup>
+        )}
+      </Fragment>
+    );
+  };
+
+  /** One rhyme-annotation cell, placed in a fixed grid column so that the
+   *  rhyme / unit / marker labels align vertically across every line. Always
+   *  rendered (empty when absent) to keep each row's cells in their columns. */
+  const renderAnnotationCell = (
+    key: string,
+    value: string | undefined,
+    column: number,
+    extra: CSSProperties,
+  ) => (
+    <span
+      key={key}
+      aria-hidden
+      style={{
+        gridColumn: column,
+        justifySelf: "start",
+        fontFamily: "var(--font-ui)",
+        fontSize: `calc(12px * ${state.zoomLevel})`,
+        lineHeight: 1,
+        whiteSpace: "nowrap",
+        userSelect: "none",
+        ...extra,
+      }}
+    >
+      {value ? `[${value}]` : ""}
+    </span>
+  );
 
   return (
     <div
@@ -226,8 +455,9 @@ export function MainText({ className }: MainTextProps) {
           <h1
             className="font-serif"
             style={{
+              fontFamily: "var(--font-zh-body)",
               fontSize: 40,
-              fontWeight: 700,
+              fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.2,
               marginBottom: 16,
@@ -269,113 +499,42 @@ export function MainText({ className }: MainTextProps) {
                 ? "var(--zh-body-line-height)"
                 : "var(--en-body-line-height)",
             color: "var(--color-text-primary)",
+            // Rhymed view: a single grid whose columns are shared by every
+            // line, so the text and each [rhyme]/[unit]/[marker] label align
+            // vertically. The 1fr text column has one width for all rows.
+            // Prose is justified for a clean block edge; verse stays left.
+            ...(rhymedRows
+              ? {
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1fr) auto auto auto",
+                  alignItems: "baseline",
+                  columnGap: 16,
+                }
+              : { textAlign: "justify" }),
           }}
           className={
             state.language === "zh" ? "font-serif" : "font-serif italic"
           }
         >
-          {spans.map((span, i) => {
-            if (span.parallels.length === 0) {
-              return (
-                <span key={i}>
-                  {hideBrackets ? stripParallelTitles(span.text) : span.text}
-                </span>
-              );
-            }
-
-            if (span.parallels.length === 1) {
-              return (
-                <span
-                  key={i}
-                  data-parallel-ids={span.parallels[0].segmentId}
-                  className="scroll-anchor"
-                  onClick={(e) =>
-                    handleHighlightClick(span.parallels, e.currentTarget)
-                  }
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.filter =
-                      "brightness(0.97)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.filter = "";
-                  }}
-                  style={{
-                    background: `var(--color-highlight-${span.parallels[0].colorKey})`,
-                    padding: "2px 4px",
-                    borderRadius: "var(--radius-sm)",
-                    cursor: "pointer",
-                    transition: "filter 150ms ease, box-shadow 150ms ease",
-                    display: "inline",
-                  }}
-                >
-                  {span.text}
-                </span>
-              );
-            }
-
-            const chars = Array.from(span.text);
-            const chunkSize = Math.max(
-              1,
-              Math.ceil(chars.length / span.parallels.length),
-            );
-            const chunks = [];
-            for (let j = 0; j < span.parallels.length; j++) {
-              const text = chars
-                .slice(j * chunkSize, (j + 1) * chunkSize)
-                .join("");
-              if (text) {
-                chunks.push({ text, parallel: span.parallels[j] });
-              }
-            }
-
-            return (
-              <span
-                key={i}
-                data-parallel-ids={span.parallels
-                  .map((p) => p.segmentId)
-                  .join(" ")}
-                className="scroll-anchor"
-                style={{
-                  display: "inline",
-                }}
-              >
-                {chunks.map((chunk, j) => (
-                  <span
-                    key={j}
-                    onClick={(e) =>
-                      handleHighlightClick(span.parallels, e.currentTarget)
-                    }
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.filter =
-                        "brightness(0.97)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.filter = "";
-                    }}
-                    style={{
-                      background: `var(--color-highlight-${chunk.parallel.colorKey})`,
-                      paddingTop: 2,
-                      paddingBottom: 2,
-                      paddingLeft: j === 0 ? 4 : 0,
-                      paddingRight: j === chunks.length - 1 ? 4 : 0,
-                      borderRadius:
-                        j === 0 && j === chunks.length - 1
-                          ? "var(--radius-sm)"
-                          : j === 0
-                            ? "var(--radius-sm) 0 0 var(--radius-sm)"
-                            : j === chunks.length - 1
-                              ? "0 var(--radius-sm) var(--radius-sm) 0"
-                              : 0,
-                      cursor: "pointer",
-                      transition: "filter 150ms ease, box-shadow 150ms ease",
-                    }}
-                  >
-                    {chunk.text}
-                  </span>
-                ))}
-              </span>
-            );
-          })}
+          {rhymedRows
+            ? rhymedRows.map(({ line, spans: lineSpans }, i) => (
+                <Fragment key={i}>
+                  <div style={{ gridColumn: 1, minWidth: 0 }}>
+                    {lineSpans.map((span, j) => renderSpan(span, j))}
+                  </div>
+                  {renderAnnotationCell(`${i}-r`, line.rhyme, 2, {
+                    color: "var(--color-accent-bright)",
+                    fontWeight: 500,
+                  })}
+                  {renderAnnotationCell(`${i}-u`, line.unit, 3, {
+                    color: "var(--color-secondary)",
+                  })}
+                  {renderAnnotationCell(`${i}-m`, line.marker, 4, {
+                    color: "var(--color-muted)",
+                  })}
+                </Fragment>
+              ))
+            : spans.map((span, i) => renderSpan(span, i, state.language === "zh"))}
         </div>
         <div style={{ height: 96 }} />
       </article>
@@ -396,13 +555,13 @@ export function MainText({ className }: MainTextProps) {
             textId: p.textId,
             chapterId: p.chapterId,
             segmentId: p.segmentId,
-            contextText:
-              (state.language === "zh" ? p.zhContext : p.enContext) ??
-              highlightText,
+            contextText: p.zhContext ?? p.enContext ?? highlightText,
             highlightText,
+            highlightRanges: p.zhContextRanges,
+            noteEn: p.noteEn,
           });
           show(
-            `Opened parallel in ${texts.getParallelText(p.textId)?.title.en ?? p.textId}`,
+            `Opened parallel in ${texts.getParallelText(p.textId)?.title.zh ?? p.textId}`,
             1800,
           );
         }}

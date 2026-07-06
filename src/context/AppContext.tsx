@@ -16,6 +16,8 @@ export interface ParallelPanelState {
   segmentId: string;
   contextText?: string;
   highlightText?: string;
+  highlightRanges?: [number, number][];
+  noteEn?: string;
 }
 
 export interface SearchState {

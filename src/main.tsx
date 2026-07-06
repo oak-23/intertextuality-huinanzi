@@ -1,3 +1,11 @@
+import "@fontsource/noto-serif-tc/400.css";
+import "@fontsource/noto-serif-tc/500.css";
+import "@fontsource/noto-serif-tc/600.css";
+import "@fontsource/noto-serif-tc/700.css";
+import "@fontsource/noto-serif-sc/latin-400.css";
+import "@fontsource/noto-serif-sc/latin-500.css";
+import "@fontsource/noto-serif-sc/latin-600.css";
+import "@fontsource/noto-serif-sc/latin-700.css";
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';

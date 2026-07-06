@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
-import { useRepositories } from "../../context/RepositoryContext";
+import { useRhymedView } from "../../hooks/useRhymedView";
 import { RangeSlider } from "../shared/RangeSlider";
 import {
   LENGTH_MIN_OPEN,
@@ -19,16 +19,14 @@ const clamp = (v: number, lo: number, hi: number) =>
  * so "no limit" persists across chapters.
  */
 export function ParallelLengthFilter() {
-  const { texts } = useRepositories();
   const { state, setLengthRange } = useApp();
-
-  const continuousChapter = texts.getContinuousChapter(state.activeChapterId);
+  const { activeParallels } = useRhymedView();
 
   // Distinct main-text locations (start:end) — one length per highlighted range.
   const { dataMin, dataMax, lengths } = useMemo(() => {
     const seen = new Set<string>();
     const lens: number[] = [];
-    for (const p of continuousChapter?.inlineParallels ?? []) {
+    for (const p of activeParallels) {
       if (p.startZh < 0) continue;
       const k = `${p.startZh}:${p.endZh}`;
       if (seen.has(k)) continue;
@@ -40,7 +38,7 @@ export function ParallelLengthFilter() {
       dataMax: lens.length ? Math.max(...lens) : 1,
       lengths: lens,
     };
-  }, [continuousChapter]);
+  }, [activeParallels]);
 
   if (state.viewMode !== "research") return null;
   if (dataMax <= dataMin) return null; // nothing meaningful to filter

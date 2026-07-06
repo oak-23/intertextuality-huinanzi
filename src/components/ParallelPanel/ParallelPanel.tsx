@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X, ChevronLeft } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
+import { useRhymedView } from "../../hooks/useRhymedView";
 import { MultiParallelPopover } from "../MainText/MultiParallelPopover";
 import {
   LENGTH_MIN_OPEN,
@@ -48,6 +49,61 @@ function renderHighlightedText(
   );
 }
 
+/** Render contextText with multiple highlighted ranges (UTF-16 [start, end) pairs).
+ *  Ranges must be sorted and non-overlapping; defensive clamping applied. */
+function renderRangedHighlightedText(
+  text: string,
+  ranges: [number, number][],
+  colorKey?: string,
+  onHighlightClick?: () => void,
+) {
+  const textLen = text.length;
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  const sorted = ranges
+    .map(([s, e]): [number, number] => [
+      Math.max(0, Math.min(s, textLen)),
+      Math.max(0, Math.min(e, textLen)),
+    ])
+    .filter(([s, e]) => e > s)
+    .sort((a, b) => a[0] - b[0]);
+
+  for (let i = 0; i < sorted.length; i++) {
+    const start = Math.max(sorted[i][0], cursor);
+    const end = Math.max(start, sorted[i][1]);
+    if (start > cursor) {
+      parts.push(text.slice(cursor, start));
+    }
+    const highlighted = text.slice(start, end);
+    if (highlighted) {
+      parts.push(
+        <span
+          key={`${i}-${start}`}
+          onClick={onHighlightClick}
+          style={{
+            backgroundColor: `var(--color-highlight-${colorKey ?? "laozi"})`,
+            borderRadius: "var(--radius-sm)",
+            padding: "2px 4px",
+            boxDecorationBreak: "clone",
+            WebkitBoxDecorationBreak: "clone",
+            cursor: onHighlightClick ? "pointer" : "default",
+          }}
+        >
+          {highlighted}
+        </span>,
+      );
+    }
+    cursor = end;
+  }
+
+  if (cursor < textLen) {
+    parts.push(text.slice(cursor));
+  }
+
+  return <>{parts}</>;
+}
+
 /** Best-effort scroll + pulse of a main-text highlight by its segment id. */
 function scrollToMainText(segmentId?: string) {
   if (!segmentId) return;
@@ -79,13 +135,13 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
 
   // --- List mode data ---
   const listText = listTextId ? texts.getParallelText(listTextId) : null;
-  const continuousChapter = texts.getContinuousChapter(state.activeChapterId);
+  const { chapter: continuousChapter, activeParallels } = useRhymedView();
   const research = state.viewMode === "research";
   const lenLo = research ? state.lengthMin : LENGTH_MIN_OPEN;
   const lenHi = research ? state.lengthMax : LENGTH_MAX_OPEN;
   const listItems: InlineParallel[] =
     listTextId && continuousChapter
-      ? continuousChapter.inlineParallels
+      ? activeParallels
           .filter(
             (p) =>
               p.textId === listTextId &&
@@ -132,6 +188,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
       segmentId: p.segmentId,
       contextText: p.zhContext ?? p.enContext ?? highlightText,
       highlightText,
+      highlightRanges: p.zhContextRanges,
+      noteEn: p.noteEn,
     });
     scrollToMainText(p.segmentId);
   };
@@ -196,20 +254,6 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             >
               <X size={16} />
             </button>
-            <p
-              style={{
-                fontFamily: "var(--font-ui)",
-                fontWeight: 500,
-                fontSize: 13,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--color-secondary)",
-                fontStyle: "italic",
-                marginBottom: 12,
-              }}
-            >
-              {text.title.en}
-            </p>
             <h2
               className="font-serif"
               style={{
@@ -225,21 +269,6 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             </h2>
             {chapter && (
               <>
-                {chapter.title.en ? (
-                  <p
-                    style={{
-                      fontFamily: "var(--font-ui)",
-                      fontWeight: 500,
-                      fontSize: 11,
-                      letterSpacing: "0.15em",
-                      textTransform: "uppercase",
-                      color: "var(--color-secondary)",
-                      marginBottom: 8,
-                    }}
-                  >
-                    {`"${chapter.title.en}"`}
-                  </p>
-                ) : null}
                 <h3
                   className="font-serif"
                   style={{
@@ -263,6 +292,40 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
               }}
             />
           </header>
+          {panel.noteEn && (
+            <div
+              style={{
+                paddingLeft: "16px",
+                marginBottom: "28px",
+                borderLeft: "3px solid var(--color-border)",
+              }}
+            >
+              <h4
+                style={{
+                  fontFamily: "var(--font-ui)",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  color: "var(--color-secondary)",
+                  marginBottom: 6,
+                }}
+              >
+                {"Editor's Comment"}
+              </h4>
+              <p
+                style={{
+                  fontFamily: "var(--font-en-body)",
+                  fontSize: `calc(14px * ${state.zoomLevel})`,
+                  lineHeight: 1.6,
+                  color: "var(--color-secondary)",
+                  fontStyle: "italic",
+                }}
+              >
+                {panel.noteEn}
+              </p>
+            </div>
+          )}
           <div
             style={{
               fontFamily:
@@ -270,25 +333,44 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                   ? "var(--font-zh-body)"
                   : "var(--font-en-body)",
               fontSize:
-                lang === "zh" ? "var(--zh-body-size)" : "var(--en-body-size)",
+                lang === "zh"
+                  ? `calc(var(--zh-body-size) * ${state.zoomLevel})`
+                  : `calc(var(--en-body-size) * ${state.zoomLevel})`,
               lineHeight:
                 lang === "zh"
                   ? "var(--zh-body-line-height)"
                   : "var(--en-body-line-height)",
               color: "var(--color-text-primary)",
+              textAlign: "justify",
             }}
           >
             <p
-              style={{ padding: "6px 8px", borderRadius: "var(--radius-sm)" }}
+              style={{
+                padding: "6px 8px",
+                borderRadius: "var(--radius-sm)",
+                whiteSpace: "pre-line",
+                fontFamily:
+                  lang === "zh"
+                    ? "var(--font-zh-body)"
+                    : "var(--font-en-body)",
+              }}
               className={lang === "zh" ? "font-serif" : "font-serif italic"}
             >
-              {renderHighlightedText(
-                panel.contextText ??
-                  (lang === "zh" ? segment.content.zh : segment.content.en),
-                panel.highlightText,
-                text.colorKey,
-                () => scrollToMainText(segment.id),
-              )}
+              {panel.highlightRanges && panel.highlightRanges.length > 0
+                ? renderRangedHighlightedText(
+                    panel.contextText ??
+                      (lang === "zh" ? segment.content.zh : segment.content.en),
+                    panel.highlightRanges,
+                    text.colorKey,
+                    () => scrollToMainText(segment.id),
+                  )
+                : renderHighlightedText(
+                    panel.contextText ??
+                      (lang === "zh" ? segment.content.zh : segment.content.en),
+                    panel.highlightText,
+                    text.colorKey,
+                    () => scrollToMainText(segment.id),
+                  )}
             </p>
           </div>
         </div>
@@ -315,20 +397,6 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             >
               <X size={16} />
             </button>
-            <p
-              style={{
-                fontFamily: "var(--font-ui)",
-                fontWeight: 500,
-                fontSize: 13,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--color-secondary)",
-                fontStyle: "italic",
-                marginBottom: 12,
-              }}
-            >
-              {listText.title.en}
-            </p>
             <h2
               className="font-serif"
               style={{
@@ -417,7 +485,7 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                       className="font-serif flex-1 min-w-0"
                       style={{
                         fontFamily: "var(--font-zh-body)",
-                        fontSize: 16,
+                        fontSize: `calc(16px * ${state.zoomLevel})`,
                         lineHeight: 1.9,
                         color: "var(--color-text-primary)",
                       }}
