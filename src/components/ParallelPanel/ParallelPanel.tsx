@@ -254,6 +254,19 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             >
               <X size={16} />
             </button>
+            <p
+              style={{
+                fontFamily: "var(--font-ui)",
+                fontWeight: 500,
+                fontSize: 12,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--color-secondary)",
+                marginBottom: 12,
+              }}
+            >
+              {text.title.en}
+            </p>
             <h2
               className="font-serif"
               style={{
@@ -282,6 +295,18 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
                 >
                   {chapter.title.zh}
                 </h3>
+                <p
+                  className="font-serif italic"
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 500,
+                    color: "var(--color-secondary)",
+                    lineHeight: 1.4,
+                    marginTop: 8,
+                  }}
+                >
+                  {chapter.title.en}
+                </p>
               </>
             )}
             <div

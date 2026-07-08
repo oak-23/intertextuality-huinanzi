@@ -49,7 +49,7 @@ const laozi: Text = {
   chapters: [
     {
       id: "laozi-66",
-      title: { zh: "第六十六章", en: "66" },
+      title: { zh: "第六十六章", en: "Chapter 66" },
       segments: [
         { id: "lz-66-01", content: { zh: "是以聖人處上而民不重", en: "" } },
         { id: "lz-66-r01", content: { zh: "是以聖人處上而民不重", en: "" } },
@@ -57,7 +57,7 @@ const laozi: Text = {
     },
     {
       id: "laozi-37",
-      title: { zh: "第三十七章", en: "37" },
+      title: { zh: "第三十七章", en: "Chapter 37" },
       segments: [
         { id: "lz-37-01", content: { zh: "道常無為而無不為", en: "" } },
         { id: "lz-37-r01", content: { zh: "道常無為而無不為", en: "" } },
@@ -65,12 +65,12 @@ const laozi: Text = {
     },
     {
       id: "laozi-48",
-      title: { zh: "第四十八章", en: "48" },
+      title: { zh: "第四十八章", en: "Chapter 48" },
       segments: [{ id: "lz-48-01", content: { zh: "無為而無不為", en: "" } }, { id: "lz-48-r01", content: { zh: "無為而無不為", en: "" } }],
     },
     {
       id: "laozi-39",
-      title: { zh: "第三十九章", en: "39" },
+      title: { zh: "第三十九章", en: "Chapter 39" },
       segments: [
         {
           id: "lz-39-01",
@@ -81,7 +81,7 @@ const laozi: Text = {
     },
     {
       id: "laozi-76",
-      title: { zh: "第七十六章", en: "76" },
+      title: { zh: "第七十六章", en: "Chapter 76" },
       segments: [
         {
           id: "lz-76-01",
@@ -92,7 +92,7 @@ const laozi: Text = {
     },
     {
       id: "laozi-57",
-      title: { zh: "第五十七章", en: "57" },
+      title: { zh: "第五十七章", en: "Chapter 57" },
       segments: [
         { id: "lz-57-01", content: { zh: "吾何以知其然哉", en: "" } },
         { id: "lz-57-02", content: { zh: "吾何以知其然哉", en: "" } },
@@ -102,7 +102,7 @@ const laozi: Text = {
     },
     {
       id: "laozi-78",
-      title: { zh: "第七十八章", en: "78" },
+      title: { zh: "第七十八章", en: "Chapter 78" },
       segments: [
         { id: "lz-78-01", content: { zh: "天下莫柔弱於水", en: "" } },
         { id: "lz-78-r01", content: { zh: "天下莫柔弱於水", en: "" } },
@@ -110,17 +110,17 @@ const laozi: Text = {
     },
     {
       id: "laozi-50",
-      title: { zh: "第五十章", en: "50" },
+      title: { zh: "第五十章", en: "Chapter 50" },
       segments: [{ id: "lz-50-01", content: { zh: "出生入死", en: "" } }, { id: "lz-50-r01", content: { zh: "出生入死", en: "" } }],
     },
     {
       id: "laozi-40",
-      title: { zh: "第四十章", en: "40" },
+      title: { zh: "第四十章", en: "Chapter 40" },
       segments: [{ id: "lz-40-01", content: { zh: "有生於無", en: "" } }, { id: "lz-40-02", content: { zh: "天下萬物", en: "" } }, { id: "lz-40-r01", content: { zh: "有生於無", en: "" } }, { id: "lz-40-r02", content: { zh: "天下萬物", en: "" } }],
     },
     {
       id: "laozi-15",
-      title: { zh: "第十五章", en: "15" },
+      title: { zh: "第十五章", en: "Chapter 15" },
       segments: [
         {
           id: "lz-15-01",
@@ -134,17 +134,17 @@ const laozi: Text = {
     },
     {
       id: "laozi-20",
-      title: { zh: "第二十章", en: "20" },
+      title: { zh: "第二十章", en: "Chapter 20" },
       segments: [{ id: "lz-20-01", content: { zh: "澹兮其若海", en: "" } }, { id: "lz-20-r01", content: { zh: "澹兮其若海", en: "" } }],
     },
     {
       id: "laozi-03",
-      title: { zh: "第三章", en: "3" },
+      title: { zh: "第三章", en: "Chapter 3" },
       segments: [{ id: "lz-03-01", content: { zh: "是以聖人之治", en: "" } }, { id: "lz-03-r01", content: { zh: "是以聖人之治", en: "" } }],
     },
     {
       id: "laozi-38",
-      title: { zh: "第三十八章", en: "38" },
+      title: { zh: "第三十八章", en: "Chapter 38" },
       segments: [
         { id: "lz-38-01", content: { zh: "上仁為之而無以為", en: "" } },
         { id: "lz-38-r01", content: { zh: "上仁為之而無以為", en: "" } },
@@ -152,7 +152,7 @@ const laozi: Text = {
     },
     {
       id: "laozi-29",
-      title: { zh: "第二十九章", en: "29" },
+      title: { zh: "第二十九章", en: "Chapter 29" },
       segments: [
         {
           id: "lz-29-01",
@@ -163,12 +163,12 @@ const laozi: Text = {
     },
     {
       id: "laozi-14",
-      title: { zh: "第十四章", en: "14" },
+      title: { zh: "第十四章", en: "Chapter 14" },
       segments: [{ id: "lz-14-01", content: { zh: "此三者不可", en: "" } }, { id: "lz-14-r01", content: { zh: "此三者不可", en: "" } }],
     },
     {
       id: "laozi-40",
-      title: { zh: "第四十章", en: "40" },
+      title: { zh: "第四十章", en: "Chapter 40" },
       segments: [{ id: "lz-40-01", content: { zh: "天下萬物", en: "" } }],
     },
   ],
@@ -181,7 +181,7 @@ const xunzi: Text = {
   chapters: [
     {
       id: "junzi",
-      title: { zh: "君子", en: "Junzi" },
+      title: { zh: "君子", en: "Junzi — On the Gentleman" },
       segments: [
         { id: "xu-jz-01", content: { zh: "不言而信，不慮而知", en: "" } },
         { id: "xu-jz-02", content: { zh: "等貴賤", en: "" } },
@@ -191,12 +191,12 @@ const xunzi: Text = {
     },
     {
       id: "jundao",
-      title: { zh: "君道", en: "Jundao" },
+      title: { zh: "君道", en: "Jundao — On the Way of a Lord" },
       segments: [{ id: "xu-jd-01", content: { zh: "明親疏", en: "" } }, { id: "xu-jd-r01", content: { zh: "明親疏", en: "" } }],
     },
     {
       id: "qiangguo",
-      title: { zh: "強國", en: "Qiangguo" },
+      title: { zh: "強國", en: "Qiangguo — On Strengthening the State" },
       segments: [
         { id: "xu-qg-01", content: { zh: "仁人之所羞而不為也", en: "" } },
         { id: "xu-qg-r01", content: { zh: "仁人之所羞而不為也", en: "" } },
@@ -212,7 +212,7 @@ const shenzi: Text = {
   chapters: [
     {
       id: "shenzi-yiwen",
-      title: { zh: "逸文", en: "Yiwen" },
+      title: { zh: "逸文", en: "Yiwen — Fragments" },
       segments: [
         { id: "sz-yw-01", content: { zh: "鳥飛於空，魚游於淵", en: "" } },
         { id: "sz-yw-02", content: { zh: "始吾未生之時，焉知生之為樂也；今吾未死，又焉知死之為不樂也", en: "" } },
@@ -230,7 +230,7 @@ const hanfeizi: Text = {
   chapters: [
     {
       id: "hf-heshi",
-      title: { zh: "和氏", en: "He shi" },
+      title: { zh: "和氏", en: "He shi — Mr. He" },
       segments: [{ id: "hf-hs-01", content: { zh: "三日三夜", en: "" } }, { id: "hf-hs-r01", content: { zh: "三日三夜", en: "" } }],
     },
   ],
@@ -243,12 +243,12 @@ const zhanguoce: Text = {
   chapters: [
     {
       id: "zgc-qin-jiuding",
-      title: { zh: "秦與師臨周而求九鼎", en: "Qin yu Shi lin Zhou er qiu jiu ding" },
+      title: { zh: "秦與師臨周而求九鼎", en: "Qin yu Shi lin Zhou er qiu jiu ding — Qin Raised Troops, Approached Zhou, and Demanded the Nine Cauldrons" },
       segments: [{ id: "zgc-qjd-01", content: { zh: "夫存危國", en: "" } }, { id: "zgc-qjd-r01", content: { zh: "夫存危國", en: "" } }],
     },
     {
       id: "zgc-suqin-chu",
-      title: { zh: "蘇秦為趙合從說楚威王", en: "Su Qin wei Zhao he zongshuo Chu Wei Wang" },
+      title: { zh: "蘇秦為趙合從說楚威王", en: "Su Qin wei Zhao he zongshuo Chu Wei Wang — Su Qin, on Behalf of Zhao, Persuaded King Wei of Chu to Join the Vertical Alliance" },
       segments: [{ id: "zgc-sqc-01", content: { zh: "存危國", en: "" } }, { id: "zgc-sqc-r01", content: { zh: "存危國", en: "" } }],
     },
   ],
@@ -261,7 +261,7 @@ const lunyu: Text = {
   chapters: [
     {
       id: "ly-yaoyue",
-      title: { zh: "堯曰", en: "Yao yue" },
+      title: { zh: "堯曰", en: "Yao yue — Yao Said" },
       segments: [{ id: "ly-yy-01", content: { zh: "繼絕世", en: "" } }, { id: "ly-yy-r01", content: { zh: "繼絕世", en: "" } }],
     },
   ],
@@ -274,7 +274,7 @@ const mengzi: Text = {
   chapters: [
     {
       id: "mz-jinxin-xia",
-      title: { zh: "盡心下", en: "jinxin xia" },
+      title: { zh: "盡心下", en: "jinxin xia — Exhausting the Heart II" },
       segments: [
         { id: "mz-jx-01", content: { zh: "口之於味也，目之於色也，耳之於聲也，鼻之於臭也", en: "" } },
         { id: "mz-jx-r01", content: { zh: "口之於味也，目之於色也，耳之於聲也，鼻之於臭也", en: "" } },
@@ -290,7 +290,7 @@ const guanzi: Text = {
   chapters: [
     {
       id: "gz-xiaocheng",
-      title: { zh: "小稱", en: "Xiao cheng" },
+      title: { zh: "小稱", en: "Xiao cheng — Minor Appraisals" },
       segments: [
         { id: "gz-xc-01", content: { zh: "君猶不能行也", en: "" } },
         { id: "gz-xc-02", content: { zh: "君猶不能行也", en: "" } },
@@ -308,7 +308,7 @@ const liji: Text = {
   chapters: [
     {
       id: "lj-liyun",
-      title: { zh: "禮運", en: "Liyun" },
+      title: { zh: "禮運", en: "Liyun — The Conveyance of Rites" },
       segments: [{ id: "lj-ly-01", content: { zh: "以天下為一家", en: "" } }, { id: "lj-ly-r01", content: { zh: "以天下為一家", en: "" } }],
     },
   ],
@@ -321,7 +321,7 @@ const zhuangzi: Text = {
   chapters: [
     {
       id: "zz-tiandi",
-      title: { zh: "天地", en: "Tiandi" },
+      title: { zh: "天地", en: "Tiandi — Heaven and Earth" },
       segments: [
         {
           id: "zz-tia-01",
@@ -370,7 +370,7 @@ const zhuangzi: Text = {
       id: "zz-qiwu-lun",
       title: {
         zh: "齊物論",
-        en: "Qiwu Lun",
+        en: "Qiwu Lun — Discussion on Making All Things Equal",
       },
       segments: [
         {
@@ -414,7 +414,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-mati",
-      title: { zh: "馬蹄", en: "Mati" },
+      title: { zh: "馬蹄", en: "Mati — Horses' Hoofs" },
       segments: [
         { id: "zz-mati-01", content: { zh: "澤無舟梁；萬物群生", en: "" } },
         { id: "zz-mati-02", content: { zh: "含哺而熙，鼓腹而遊", en: "" } },
@@ -426,7 +426,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-keyi",
-      title: { zh: "刻意", en: "Keyi" },
+      title: { zh: "刻意", en: "Keyi — Constrained in Will" },
       segments: [
         { id: "zz-keyi-01", content: { zh: "不可為象", en: "" } },
         { id: "zz-keyi-02", content: { zh: "感而後應，迫而後動", en: "" } },
@@ -450,7 +450,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-xiaoyaoyou",
-      title: { zh: "逍遙遊", en: "Xiaoyaoyou" },
+      title: { zh: "逍遙遊", en: "Xiaoyaoyou — Free and Easy Wandering" },
       segments: [
         { id: "zz-xyy-01", content: { zh: "羊角而上", en: "" } },
         { id: "zz-xyy-02", content: { zh: "則所用之異也", en: "" } },
@@ -464,7 +464,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-zhibeiyou",
-      title: { zh: "知北遊", en: "Zhi beiyou" },
+      title: { zh: "知北遊", en: "Zhi beiyou — Knowledge Wandered North" },
       segments: [
         { id: "zz-zby-01", content: { zh: "與物化", en: "" } },
         {
@@ -517,7 +517,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-dasheng",
-      title: { zh: "達生", en: "Dasheng" },
+      title: { zh: "達生", en: "Dasheng — Mastering Life" },
       segments: [
         { id: "zz-ds-01", content: { zh: "與物化", en: "" } },
         { id: "zz-ds-02", content: { zh: "芒然彷徨乎塵垢之外，逍遙乎無事之業", en: "" } },
@@ -527,7 +527,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-waiwu",
-      title: { zh: "外物", en: "Waiwu" },
+      title: { zh: "外物", en: "Waiwu — External Things" },
       segments: [
         {
           id: "zz-ww-01",
@@ -540,7 +540,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-tianyun",
-      title: { zh: "天運", en: "Tianyun" },
+      title: { zh: "天運", en: "Tianyun — The Turning of Heaven" },
       segments: [
         { id: "zz-ty-01", content: { zh: "性不可易", en: "" } },
         { id: "zz-ty-02", content: { zh: "由外入者，無主於中", en: "" } },
@@ -562,7 +562,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-qiushui",
-      title: { zh: "秋水", en: "Qiushui" },
+      title: { zh: "秋水", en: "Qiushui — Autumn Floods" },
       segments: [
         {
           id: "zz-qy-01",
@@ -594,7 +594,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-shanxing",
-      title: { zh: "繕性", en: "Shanxing" },
+      title: { zh: "繕性", en: "Shanxing — Mending the Inborn Nature" },
       segments: [
         { id: "zz-sx-01", content: { zh: "是故安而不順", en: "" } },
         { id: "zz-sx-02", content: { zh: "人雖有知，無所用之", en: "" } },
@@ -622,7 +622,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-pianmu",
-      title: { zh: "駢拇", en: "Pianmu" },
+      title: { zh: "駢拇", en: "Pianmu — Webbed Toes" },
       segments: [
         {
           id: "zz-pm-01",
@@ -639,7 +639,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-zhile",
-      title: { zh: "至樂", en: "Zhile" },
+      title: { zh: "至樂", en: "Zhile — Perfect Happiness" },
       segments: [
         { id: "zz-zl-01", content: { zh: "夜以繼日", en: "" } },
         { id: "zz-zl-02", content: { zh: "塵垢也。死生為晝夜", en: "" } },
@@ -648,7 +648,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-rangwang",
-      title: { zh: "讓王", en: "Rangwang" },
+      title: { zh: "讓王", en: "Rangwang — Giving Away a Throne" },
       segments: [
         { id: "zz-rw-01", content: { zh: "必察其所以之", en: "" } },
         { id: "zz-rw-02", content: { zh: "以自樂也", en: "" } },
@@ -672,7 +672,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-zaiyou",
-      title: { zh: "在宥", en: "Zaiyou" },
+      title: { zh: "在宥", en: "Zaiyou — Let It Be, Leave It Alone" },
       segments: [
         { id: "zz-zy-01", content: { zh: "性命之情", en: "" } },
         { id: "zz-zay-01", content: { zh: "使天下欣欣焉人樂其性，是不恬也", en: "" } },
@@ -686,7 +686,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-dazongshi",
-      title: { zh: "大宗師", en: "Dazongshi" },
+      title: { zh: "大宗師", en: "Dazongshi — The Great and Venerable Teacher" },
       segments: [
         { id: "zz-dqs-01", content: { zh: "入水不濡，入火不熱", en: "" } },
         { id: "zz-dqs-02", content: { zh: "夫大塊載我以形，勞我以生，佚我以老，息我以死。故善吾生者，乃所以善吾死也。夫藏舟於壑，藏山於澤，謂之固矣。然而夜半有力者負之而走，昧者不知也。藏大小有宜，猶有所遯。若夫藏天下於天下，而不得所遯，是恆物之大情也。特犯人之形而猶喜之，若人之形者，萬化而未始有極也，其為樂可勝計邪", en: "" } },
@@ -708,7 +708,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-dechongfu",
-      title: { zh: "德充符", en: "Dechongfu" },
+      title: { zh: "德充符", en: "Dechongfu — The Sign of Virtue Complete" },
       segments: [
         { id: "zz-dcf-01", content: { zh: "不足以滑和", en: "" } },
         { id: "zz-dcf-02", content: { zh: "立不教，坐不議", en: "" } },
@@ -730,7 +730,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-shanmu",
-      title: { zh: "山木", en: "Shanmu" },
+      title: { zh: "山木", en: "Shanmu — The Mountain Tree" },
       segments: [
         { id: "zz-sm-01", content: { zh: "一龍一蛇，與時俱化", en: "" } },
         { id: "zz-sm-02", content: { zh: "夫萬物之", en: "" } },
@@ -740,7 +740,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-renjianshi",
-      title: { zh: "人間世", en: "Renjianshi" },
+      title: { zh: "人間世", en: "Renjianshi — In the World of Men" },
       segments: [
         { id: "zz-rjs-01", content: { zh: "猶足以養其身", en: "" } },
         { id: "zz-rjs-02", content: { zh: "虛室生白，吉祥止止", en: "" } },
@@ -750,7 +750,7 @@ const zhuangzi: Text = {
     },
     {
       id: "zz-quqie",
-      title: { zh: "胠篋", en: "Quqie" },
+      title: { zh: "胠篋", en: "Quqie — Rifling Trunks" },
       segments: [
         { id: "zz-qq-01", content: { zh: "至德之世", en: "" } },
         { id: "zz-qq-02", content: { zh: "聖人哉！然而", en: "" } },
@@ -776,7 +776,7 @@ const lushichunqiu: Text = {
   chapters: [
     {
       id: "lsc-zhizhong",
-      title: { zh: "志忠", en: "Zhizhong" },
+      title: { zh: "志忠", en: "Zhizhong — Utmost Loyalty" },
       segments: [
         { id: "lsc-zz-01", content: { zh: "三日三夜，顏色不變", en: "" } },
         { id: "lsc-zz-r01", content: { zh: "三日三夜，顏色不變", en: "" } },
