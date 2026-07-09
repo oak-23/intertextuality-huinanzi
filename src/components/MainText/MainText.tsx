@@ -419,7 +419,15 @@ export function MainText({ className }: MainTextProps) {
         const display = plainDisplayText(next.text, isProseZh);
         const m = display.match(CITATION_PREFIX_RE);
         if (m) {
-          out.push(<span key={`cit-${i}`}>{m[0]}</span>, sup);
+          // Breathing room between a 。？！-final highlight and its citation
+          // bracket (those highlights end flush against the bracket).
+          const gap = /[。？！]$/.test(span.text) && /^[《（]/.test(m[0]);
+          out.push(
+            <span key={`cit-${i}`} style={gap ? { marginLeft: 8 } : undefined}>
+              {m[0]}
+            </span>,
+            sup,
+          );
           const rest = display.slice(m[0].length);
           if (rest) out.push(<span key={`rest-${i}`}>{rest}</span>);
           i++; // next span consumed
