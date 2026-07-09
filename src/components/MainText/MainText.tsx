@@ -394,9 +394,10 @@ export function MainText({ className }: MainTextProps) {
 
   /** Leading citation cluster of a plain span's DISPLAY text: optional
    *  whitespace/punctuation, one or more 《…》/（…） citations, then a trailing
-   *  punctuation run. The footnote sup is placed after this cluster. */
+   *  punctuation run — or, when no citation follows (e.g. brackets hidden),
+   *  just the punctuation run. The footnote sup is placed after this. */
   const CITATION_PREFIX_RE =
-    /^[\s，。；：、！？」』]*(?:《[^《》]*》|（[^（）]*）)+[，。；：、！？」』]*/;
+    /^[\s，。；：、！？」』]*(?:《[^《》]*》|（[^（）]*）)+[，。；：、！？」』]*|^\s*[，。；：、！？」』]+/;
 
   /** Render a span list, placing each footnote sup after the citation
    *  brackets (and any punctuation just after them) instead of right after
