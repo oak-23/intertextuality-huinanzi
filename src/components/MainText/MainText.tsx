@@ -485,11 +485,11 @@ export function MainText({ className }: MainTextProps) {
             style={{
               fontFamily: "var(--font-ui)",
               fontWeight: 500,
-              fontSize: 14,
+              fontSize: 12,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
               color: "var(--color-secondary)",
-              marginBottom: 16,
+              marginBottom: 12,
             }}
           >
             {continuousText.title.en}
@@ -497,8 +497,8 @@ export function MainText({ className }: MainTextProps) {
           <h1
             className="font-serif"
             style={{
+              fontSize: 32,
               fontFamily: "var(--font-zh-body)",
-              fontSize: 40,
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.2,
@@ -506,15 +506,28 @@ export function MainText({ className }: MainTextProps) {
               color: "var(--color-text-primary)",
             }}
           >
-            {chapterTitle.zh}
+            {continuousText.title.zh}
           </h1>
+          <h2
+            className="font-serif"
+            style={{
+              fontSize: 24,
+              fontFamily: "var(--font-zh-body)",
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+              color: "var(--color-text-primary)",
+            }}
+          >
+            {chapterTitle.zh}
+          </h2>
           <p
             className="font-serif italic"
             style={{
-              fontSize: 22,
+              fontSize: 16,
               fontWeight: 500,
               color: "var(--color-secondary)",
               lineHeight: 1.4,
+              marginTop: 8,
             }}
           >
             {chapterTitle.en}
@@ -522,10 +535,10 @@ export function MainText({ className }: MainTextProps) {
           <div
             aria-hidden
             style={{
-              width: 48,
+              width: 36,
               height: 1,
               backgroundColor: "var(--color-border)",
-              margin: "32px auto 0",
+              margin: "24px auto 0",
             }}
           />
         </header>
