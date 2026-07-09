@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback, Fragment } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { useRhymedView } from "../../hooks/useRhymedView";
@@ -262,63 +262,60 @@ export function MainText({ className }: MainTextProps) {
 
   const chapterTitle = chapter.title;
 
+  const footnoteSupStyle: CSSProperties = {
+    fontFamily: "var(--font-ui)",
+    fontSize: `calc(12px * ${state.zoomLevel})`,
+    color: "var(--color-secondary)",
+    userSelect: "none",
+    marginLeft: 2,
+    marginRight: 8,
+    lineHeight: 1,
+    verticalAlign: "super",
+  };
+
+  /** Display text of a PLAIN span (citation hiding / localization applied). */
+  const plainDisplayText = (text: string, isProseZh: boolean) =>
+    hideBrackets
+      ? stripParallelTitles(text)
+      : isProseZh
+        ? localizeParallelTitles(text)
+        : text;
+
   /** Render one text span (plain, single-parallel, or multi-parallel).
    *  Pass isProseZh=true only from the prose (non-rhymed) zh render path to
    *  enable citation localization; rhymed lines and the 'en' path must not pass it. */
   const renderSpan = (span: TextSpan, i: number, isProseZh = false) => {
     if (span.parallels.length === 0) {
-      const displayText = hideBrackets
-        ? stripParallelTitles(span.text)
-        : isProseZh
-          ? localizeParallelTitles(span.text)
-          : span.text;
-      return <span key={i}>{displayText}</span>;
+      return <span key={i}>{plainDisplayText(span.text, isProseZh)}</span>;
     }
 
-    const footnoteSupStyle: CSSProperties = {
-      fontFamily: "var(--font-ui)",
-      fontSize: `calc(12px * ${state.zoomLevel})`,
-      color: "var(--color-secondary)",
-      userSelect: "none",
-      marginLeft: 2,
-      lineHeight: 1,
-      verticalAlign: "super",
-    };
-
     if (span.parallels.length === 1) {
-      const fn = span.parallels[0].footnote;
       return (
-        <Fragment key={i}>
-          <span
-            data-parallel-ids={span.parallels[0].segmentId}
-            className="scroll-anchor"
-            onClick={(e) =>
-              handleHighlightClick(span.parallels, e.currentTarget)
-            }
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.filter =
-                "brightness(0.97)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.filter = "";
-            }}
-            style={{
-              background: `var(--color-highlight-${span.parallels[0].colorKey})`,
-              padding: "2px 4px",
-              borderRadius: "var(--radius-sm)",
-              cursor: "pointer",
-              transition: "filter 150ms ease, box-shadow 150ms ease",
-              display: "inline",
-            }}
-          >
-            {isProseZh ? localizeParallelTitles(span.text) : span.text}
-          </span>
-          {fn !== undefined && (
-            <sup aria-hidden style={footnoteSupStyle}>
-              {fn}
-            </sup>
-          )}
-        </Fragment>
+        <span
+          key={i}
+          data-parallel-ids={span.parallels[0].segmentId}
+          className="scroll-anchor"
+          onClick={(e) =>
+            handleHighlightClick(span.parallels, e.currentTarget)
+          }
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.filter =
+              "brightness(0.97)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.filter = "";
+          }}
+          style={{
+            background: `var(--color-highlight-${span.parallels[0].colorKey})`,
+            padding: "2px 4px",
+            borderRadius: "var(--radius-sm)",
+            cursor: "pointer",
+            transition: "filter 150ms ease, box-shadow 150ms ease",
+            display: "inline",
+          }}
+        >
+          {isProseZh ? localizeParallelTitles(span.text) : span.text}
+        </span>
       );
     }
 
@@ -336,25 +333,15 @@ export function MainText({ className }: MainTextProps) {
       }
     }
 
-    const uniqueFootnotes = [
-      ...new Set(
-        span.parallels
-          .map((p) => p.footnote)
-          .filter((n): n is number => n !== undefined),
-      ),
-    ];
-    const footnoteLabel =
-      uniqueFootnotes.length > 0 ? uniqueFootnotes.join(",") : null;
-
     return (
-      <Fragment key={i}>
-        <span
-          data-parallel-ids={span.parallels.map((p) => p.segmentId).join(" ")}
-          className="scroll-anchor"
-          style={{
-            display: "inline",
-          }}
-        >
+      <span
+        key={i}
+        data-parallel-ids={span.parallels.map((p) => p.segmentId).join(" ")}
+        className="scroll-anchor"
+        style={{
+          display: "inline",
+        }}
+      >
           {chunks.map((chunk, j) => (
             <span
               key={j}
@@ -389,14 +376,59 @@ export function MainText({ className }: MainTextProps) {
               {chunk.text}
             </span>
           ))}
-        </span>
-        {footnoteLabel !== null && (
-          <sup aria-hidden style={footnoteSupStyle}>
-            {footnoteLabel}
-          </sup>
-        )}
-      </Fragment>
+      </span>
     );
+  };
+
+  /** Footnote label for a highlighted span ("3" or "3,4"), null when none. */
+  const footnoteLabelOf = (span: TextSpan): string | null => {
+    const nums = [
+      ...new Set(
+        span.parallels
+          .map((p) => p.footnote)
+          .filter((n): n is number => n !== undefined),
+      ),
+    ];
+    return nums.length > 0 ? nums.join(",") : null;
+  };
+
+  /** Leading citation cluster of a plain span's DISPLAY text: optional
+   *  whitespace/punctuation, one or more 《…》/（…） citations, then a trailing
+   *  punctuation run. The footnote sup is placed after this cluster. */
+  const CITATION_PREFIX_RE =
+    /^[\s，。；：、！？」』]*(?:《[^《》]*》|（[^（）]*）)+[，。；：、！？」』]*/;
+
+  /** Render a span list, placing each footnote sup after the citation
+   *  brackets (and any punctuation just after them) instead of right after
+   *  the highlight. Falls back to right-after-highlight when no citation
+   *  follows (e.g. hidden brackets, footnote-only parallels). */
+  const renderSpans = (spanList: TextSpan[], isProseZh = false) => {
+    const out: ReactNode[] = [];
+    for (let i = 0; i < spanList.length; i++) {
+      const span = spanList[i];
+      out.push(renderSpan(span, i, isProseZh));
+      const label = footnoteLabelOf(span);
+      if (label === null) continue;
+      const sup = (
+        <sup key={`fn-${i}`} aria-hidden style={footnoteSupStyle}>
+          {label}
+        </sup>
+      );
+      const next = spanList[i + 1];
+      if (next && next.parallels.length === 0) {
+        const display = plainDisplayText(next.text, isProseZh);
+        const m = display.match(CITATION_PREFIX_RE);
+        if (m) {
+          out.push(<span key={`cit-${i}`}>{m[0]}</span>, sup);
+          const rest = display.slice(m[0].length);
+          if (rest) out.push(<span key={`rest-${i}`}>{rest}</span>);
+          i++; // next span consumed
+          continue;
+        }
+      }
+      out.push(sup);
+    }
+    return out;
   };
 
   /** One rhyme-annotation cell, placed in a fixed grid column so that the
@@ -521,7 +553,7 @@ export function MainText({ className }: MainTextProps) {
             ? rhymedRows.map(({ line, spans: lineSpans }, i) => (
                 <Fragment key={i}>
                   <div style={{ gridColumn: 1, minWidth: 0 }}>
-                    {lineSpans.map((span, j) => renderSpan(span, j))}
+                    {renderSpans(lineSpans)}
                   </div>
                   {renderAnnotationCell(`${i}-r`, line.rhyme, 2, {
                     color: "var(--color-accent-bright)",
@@ -535,7 +567,7 @@ export function MainText({ className }: MainTextProps) {
                   })}
                 </Fragment>
               ))
-            : spans.map((span, i) => renderSpan(span, i, state.language === "zh"))}
+            : renderSpans(spans, state.language === "zh")}
         </div>
         <div style={{ height: 96 }} />
       </article>
