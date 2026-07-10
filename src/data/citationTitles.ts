@@ -43,10 +43,12 @@ export const citationZhByKey: Record<string, string> = {
   "Laozi 78": "《老子・第七十八章》",
   "Li ji \"Liyun\"": "《禮記・禮運》",
   "Lun yu \"Yao yue\"": "《論語・堯曰》",
+  "Lüshi chunqiu \"Zhizhong\"": "《呂氏春秋・志忠》", // hand-added: owner attribution correction 2026-07-10
   "Mengzi \"jinxin xia\"": "《孟子・盡心下》",
   "Shenzi \"Yiwen\"": "《慎子・逸文》",
   "Xunzi \"Jundao\"": "《荀子・君道》",
   "Xunzi \"Junzi\"": "《荀子・君子》",
+  "Xunzi \"Qiangguo\" or Zhuangzi \"Tiandi\"": "《荀子・強國》《莊子・天地》", // hand-added: owner attribution correction 2026-07-10
   "Zhanguo ce \"Qin yu Shi lin Zhou er qiu jiu ding\" or \"Su Qin wei Zhao he zongshuo Chu Wei Wang\"": "《戰國策・秦與師臨周而求九鼎》《戰國策・蘇秦為趙合從說楚威王》",
   "Zhuangzi \" Tiandi\"": "《莊子・天地》",
   "Zhuangzi \"Dasheng\" or \"Dazongshi\"": "《莊子・達生》《莊子・大宗師》",
