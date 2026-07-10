@@ -1,7 +1,7 @@
 export type Language = "zh" | "en";
 export type DisplayMode = "prose" | "rhymed";
 export type ViewMode = "normal" | "research";
-export type SearchScope = "main" | "parallel";
+export type SearchScope = "all" | "main" | "parallel";
 
 export type ColorKey =
   | "laozi"
@@ -142,6 +142,14 @@ export interface SearchResult {
   chapterId: string;
   segmentId: string;
   matchedText: string;
+  /** Character offset of the match within the continuous chapter text (main scope only). */
+  matchOffset?: number;
+  /** Exact length of the match within the continuous chapter text */
+  matchLength?: number;
+  /** The N-th occurrence of this query in the chapter */
+  matchIndex?: number;
+  /** The exact query string that was matched */
+  matchQuery?: string;
 }
 
 export interface AuthResult {

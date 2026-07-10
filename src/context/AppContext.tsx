@@ -93,7 +93,7 @@ export const initialAppState: AppState = {
   panelsSwapped: false,
   annotationMode: false,
   auth: { loggedIn: false, email: null },
-  searchState: { query: "", scope: "main", matches: [], currentIndex: 0 },
+  searchState: { query: "", scope: "all", matches: [], currentIndex: 0 },
   zoomLevel: 1,
   hiddenTexts: [],
   parallelListTextId: null,
@@ -122,12 +122,6 @@ function reducer(state: AppState, action: AppAction): AppState {
         parallelPanel: null,
         parallelListTextId: null,
         panelsSwapped: false,
-        searchState: {
-          ...state.searchState,
-          matches: [],
-          currentIndex: 0,
-          query: "",
-        },
       };
     case "SELECT_SEGMENT":
       return { ...state, selectedSegmentId: action.segmentId };

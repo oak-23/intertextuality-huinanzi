@@ -126,7 +126,7 @@ function ScopeToggle({
         height: 24,
       }}
     >
-      {(['main', 'parallel'] as const).map((s) => {
+      {(['all', 'main', 'parallel'] as const).map((s) => {
         const active = value === s;
         return (
           <button
@@ -144,7 +144,7 @@ function ScopeToggle({
               fontSize: 11,
             }}
           >
-            {s === 'main' ? 'Main' : 'Parallel'}
+            {s === 'all' ? 'All' : s === 'main' ? 'Main' : 'Parallel'}
           </button>
         );
       })}
