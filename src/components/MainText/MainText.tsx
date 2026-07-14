@@ -3,7 +3,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { useRhymedView } from "../../hooks/useRhymedView";
+import { useAnnotations } from "../../hooks/useAnnotations";
 import { useToast } from "../shared/Toast";
+import { AnnotationPopover } from "../Annotations/AnnotationPopover";
 import { MultiParallelPopover } from "./MultiParallelPopover";
 import {
   LENGTH_MIN_OPEN,
@@ -135,6 +137,12 @@ export function MainText({ className }: MainTextProps) {
   const [multiAnchor, setMultiAnchor] = useState<HTMLElement | null>(null);
   const [multiParallels, setMultiParallels] = useState<ParallelOption[]>([]);
 
+  const [annotationOpen, setAnnotationOpen] = useState(false);
+  const [annotationSegmentId, setAnnotationSegmentId] = useState<string | null>(
+    null,
+  );
+  const { countForSegment } = useAnnotations(state.activeChapterId);
+
   const continuousText = texts.getMainContinuousText();
   const chapter =
     continuousText?.chapters.find((c) => c.id === state.activeChapterId) ??
@@ -207,6 +215,12 @@ export function MainText({ className }: MainTextProps) {
     (parallels: InlineParallel[], anchor: HTMLElement) => {
       if (parallels.length === 0) return;
 
+      if (state.annotationMode) {
+        setAnnotationSegmentId(parallels[0].segmentId);
+        setAnnotationOpen(true);
+        return;
+      }
+
       if (parallels.length === 1) {
         const p = parallels[0];
         const segment = texts.getSegment(p.textId, p.chapterId, p.segmentId);
@@ -253,7 +267,7 @@ export function MainText({ className }: MainTextProps) {
         setMultiAnchor(anchor);
       }
     },
-    [openParallel, show, texts],
+    [openParallel, show, texts, state.annotationMode],
   );
 
   if (!chapter || !continuousText) {
@@ -399,6 +413,44 @@ export function MainText({ className }: MainTextProps) {
   const CITATION_PREFIX_RE =
     /^[\s，。；：、！？」』]*(?:《[^《》]*》|（[^（）]*）)+[，。；：、！？」』]*|^\s*[，。；：、！？」』]+/;
 
+  /** Small inline badge on highlights that carry saved annotations. */
+  const annotationBadge = (segmentId: string, key: string) => {
+    const count = countForSegment(segmentId);
+    if (count === 0) return null;
+    return (
+      <button
+        key={key}
+        type="button"
+        aria-label={`${count} annotation${count > 1 ? "s" : ""} on this passage`}
+        onClick={() => {
+          setAnnotationSegmentId(segmentId);
+          setAnnotationOpen(true);
+        }}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: 14,
+          height: 14,
+          padding: "0 3px",
+          marginLeft: 2,
+          verticalAlign: "super",
+          borderRadius: 9999,
+          backgroundColor: "var(--color-accent-bright)",
+          color: "var(--color-text-inverse)",
+          border: "none",
+          fontFamily: "var(--font-ui)",
+          fontSize: 9,
+          fontWeight: 600,
+          lineHeight: 1,
+          cursor: "pointer",
+        }}
+      >
+        {count > 1 ? count : ""}
+      </button>
+    );
+  };
+
   /** Render a span list, placing each footnote sup after the citation
    *  brackets (and any punctuation just after them) instead of right after
    *  the highlight. Falls back to right-after-highlight when no citation
@@ -408,8 +460,15 @@ export function MainText({ className }: MainTextProps) {
     for (let i = 0; i < spanList.length; i++) {
       const span = spanList[i];
       out.push(renderSpan(span, i, isProseZh));
+      const badge =
+        span.parallels.length > 0
+          ? annotationBadge(span.parallels[0].segmentId, `ann-${i}`)
+          : null;
       const label = footnoteLabelOf(span);
-      if (label === null) continue;
+      if (label === null) {
+        if (badge) out.push(badge);
+        continue;
+      }
       const sup = (
         <sup key={`fn-${i}`} aria-hidden style={footnoteSupStyle}>
           {label}
@@ -429,6 +488,7 @@ export function MainText({ className }: MainTextProps) {
             </span>,
             sup,
           );
+          if (badge) out.push(badge);
           const rest = display.slice(m[0].length);
           if (rest) out.push(<span key={`rest-${i}`}>{rest}</span>);
           i++; // next span consumed
@@ -436,6 +496,7 @@ export function MainText({ className }: MainTextProps) {
         }
       }
       out.push(sup);
+      if (badge) out.push(badge);
     }
     return out;
   };
@@ -593,6 +654,33 @@ export function MainText({ className }: MainTextProps) {
         </div>
         <div style={{ height: 96 }} />
       </article>
+      {state.annotationMode && (
+        <div
+          aria-live="polite"
+          style={{
+            position: "fixed",
+            bottom: 16,
+            left: "calc(var(--sidebar-width) + 24px)",
+            padding: "6px 12px",
+            backgroundColor: "var(--color-accent-bright)",
+            color: "var(--color-text-inverse)",
+            borderRadius: "var(--radius-toggle)",
+            fontFamily: "var(--font-ui)",
+            fontSize: 12,
+            fontWeight: 500,
+            zIndex: 30,
+            boxShadow: "var(--shadow-popover)",
+          }}
+        >
+          Annotation mode — click a highlighted parallel to add a note.
+        </div>
+      )}
+      <AnnotationPopover
+        open={annotationOpen}
+        onClose={() => setAnnotationOpen(false)}
+        chapterId={state.activeChapterId}
+        segmentId={annotationSegmentId}
+      />
       <MultiParallelPopover
         open={multiAnchor !== null}
         anchor={multiAnchor}
