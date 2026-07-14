@@ -66,6 +66,7 @@
   --color-highlight-hanfeizi: #99d5cf;
   --color-highlight-shanhaijing: #f6a5c0;
   --color-highlight-shiji: #ffe69b;
+  --color-highlight-annotation: rgba(255, 235, 120, 0.4);
 
   --top-bar-height: 56px;
   --sidebar-width: 280px;
