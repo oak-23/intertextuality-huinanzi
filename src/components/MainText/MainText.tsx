@@ -64,6 +64,28 @@ function localizeParallelTitles(text: string): string {
   });
 }
 
+/** textId marking synthetic span entries for selection-anchored annotations. */
+const ANNOTATION_TEXT_ID = "__annotation__";
+
+/** Selection-annotation segmentId: view (p=prose zh, r=rhymed) + data-text range. */
+const SELECTION_ID_RE = /^sel:([pr]):(\d+)-(\d+)$/;
+
+/** Longest piece of the selected DISPLAY text that occurs verbatim in the
+ *  data text. Display artifacts (footnote sups, rhyme/unit labels, localized
+ *  citations) never occur in the data, so they are cut and the longest
+ *  surviving fragment anchors the note. */
+function anchorQuote(raw: string, dataText: string): string | null {
+  if (raw.length >= 2 && dataText.includes(raw)) return raw;
+  const candidates = raw
+    .replace(/《[^《》]*》/g, "\n")
+    .replace(/（[^（）]*）/g, "\n")
+    .replace(/\[[^\]]*\]/g, "\n")
+    .replace(/[0-9,]+/g, "\n")
+    .split(/\s+/)
+    .filter((s) => s.length >= 2 && dataText.includes(s));
+  return candidates.sort((a, b) => b.length - a.length)[0] ?? null;
+}
+
 /**
  * Split a continuous text string into alternating plain / highlighted spans
  * based on the InlineParallel ranges for the given language.
@@ -141,12 +163,38 @@ export function MainText({ className }: MainTextProps) {
   const [annotationSegmentId, setAnnotationSegmentId] = useState<string | null>(
     null,
   );
-  const { countForSegment } = useAnnotations(state.activeChapterId);
+  const { annotations, countForSegment } = useAnnotations(
+    state.activeChapterId,
+  );
 
   const continuousText = texts.getMainContinuousText();
   const chapter =
     continuousText?.chapters.find((c) => c.id === state.activeChapterId) ??
     null;
+
+  /** Saved selection annotations of the active view as synthetic span
+   *  entries, so the span splitter underlines their text ranges. */
+  const selectionDecorations = useMemo(() => {
+    const view = rhymedActive ? "r" : "p";
+    const seen = new Set<string>();
+    const out: InlineParallel[] = [];
+    for (const a of annotations) {
+      const m = a.segmentId.match(SELECTION_ID_RE);
+      if (!m || m[1] !== view || seen.has(a.segmentId)) continue;
+      seen.add(a.segmentId);
+      out.push({
+        startZh: Number(m[2]),
+        endZh: Number(m[3]),
+        startEn: -1,
+        endEn: 0,
+        textId: ANNOTATION_TEXT_ID,
+        chapterId: "",
+        segmentId: a.segmentId,
+        colorKey: "laozi", // never rendered; annotation spans underline instead
+      });
+    }
+    return out;
+  }, [annotations, rhymedActive]);
 
   const spans = useMemo(() => {
     if (!chapter || rhymedActive) return [];
@@ -159,7 +207,12 @@ export function MainText({ className }: MainTextProps) {
     const visible = chapter.inlineParallels.filter(
       (p) => !hidden.has(p.textId) && withinLengthRange(p, lo, hi),
     );
-    return splitIntoSpans(fullText, visible, state.language);
+    // Selection annotations anchor to zh offsets only
+    const withDecorations =
+      state.language === "zh"
+        ? [...visible, ...selectionDecorations]
+        : visible;
+    return splitIntoSpans(fullText, withDecorations, state.language);
   }, [
     chapter,
     rhymedActive,
@@ -168,6 +221,7 @@ export function MainText({ className }: MainTextProps) {
     state.viewMode,
     state.lengthMin,
     state.lengthMax,
+    selectionDecorations,
   ]);
 
   /** Rhymed view: per-line spans plus the line's rhyme annotations. */
@@ -176,12 +230,15 @@ export function MainText({ className }: MainTextProps) {
     const hidden = new Set(state.hiddenTexts);
     const lo = state.lengthMin;
     const hi = state.lengthMax;
-    const visible = rhymed.inlineParallels.filter(
-      (p) =>
-        p.startZh >= 0 &&
-        !hidden.has(p.textId) &&
-        withinLengthRange(p, lo, hi),
-    );
+    const visible = [
+      ...rhymed.inlineParallels.filter(
+        (p) =>
+          p.startZh >= 0 &&
+          !hidden.has(p.textId) &&
+          withinLengthRange(p, lo, hi),
+      ),
+      ...selectionDecorations,
+    ];
     const rows: { line: RhymedLine; spans: TextSpan[] }[] = [];
     let offset = 0;
     for (const line of rhymed.lines) {
@@ -206,6 +263,7 @@ export function MainText({ className }: MainTextProps) {
     state.hiddenTexts,
     state.lengthMin,
     state.lengthMax,
+    selectionDecorations,
   ]);
 
   const hideBrackets =
@@ -299,19 +357,41 @@ export function MainText({ className }: MainTextProps) {
    *  Pass isProseZh=true only from the prose (non-rhymed) zh render path to
    *  enable citation localization; rhymed lines and the 'en' path must not pass it. */
   const renderSpan = (span: TextSpan, i: number, isProseZh = false) => {
-    if (span.parallels.length === 0) {
-      return <span key={i}>{plainDisplayText(span.text, isProseZh)}</span>;
-    }
+    const real = span.parallels.filter((p) => p.textId !== ANNOTATION_TEXT_ID);
+    const selAnns = span.parallels.filter(
+      (p) => p.textId === ANNOTATION_TEXT_ID,
+    );
 
-    if (span.parallels.length === 1) {
+    if (real.length === 0) {
+      const displayText = plainDisplayText(span.text, isProseZh);
+      if (selAnns.length === 0) return <span key={i}>{displayText}</span>;
+      // Selection-annotated plain text: dotted underline, click to open notes
       return (
         <span
           key={i}
-          data-parallel-ids={span.parallels[0].segmentId}
+          onClick={() => {
+            setAnnotationSegmentId(selAnns[0].segmentId);
+            setAnnotationOpen(true);
+          }}
+          style={{
+            textDecoration: "underline dotted",
+            textDecorationColor: "var(--color-accent-bright)",
+            textUnderlineOffset: 4,
+            cursor: "pointer",
+          }}
+        >
+          {displayText}
+        </span>
+      );
+    }
+
+    if (real.length === 1) {
+      return (
+        <span
+          key={i}
+          data-parallel-ids={real[0].segmentId}
           className="scroll-anchor"
-          onClick={(e) =>
-            handleHighlightClick(span.parallels, e.currentTarget)
-          }
+          onClick={(e) => handleHighlightClick(real, e.currentTarget)}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLElement).style.filter =
               "brightness(0.97)";
@@ -320,7 +400,7 @@ export function MainText({ className }: MainTextProps) {
             (e.currentTarget as HTMLElement).style.filter = "";
           }}
           style={{
-            background: `var(--color-highlight-${span.parallels[0].colorKey})`,
+            background: `var(--color-highlight-${real[0].colorKey})`,
             padding: "2px 4px",
             borderRadius: "var(--radius-sm)",
             cursor: "pointer",
@@ -334,7 +414,7 @@ export function MainText({ className }: MainTextProps) {
     }
 
     const chars = Array.from(span.text);
-    const n = span.parallels.length;
+    const n = real.length;
     const chunks = [];
     for (let j = 0; j < n; j++) {
       // Even partition so every parallel gets a slice (and its color) when
@@ -343,14 +423,14 @@ export function MainText({ className }: MainTextProps) {
       const end = Math.round(((j + 1) * chars.length) / n);
       const text = chars.slice(start, end).join("");
       if (text) {
-        chunks.push({ text, parallel: span.parallels[j] });
+        chunks.push({ text, parallel: real[j] });
       }
     }
 
     return (
       <span
         key={i}
-        data-parallel-ids={span.parallels.map((p) => p.segmentId).join(" ")}
+        data-parallel-ids={real.map((p) => p.segmentId).join(" ")}
         className="scroll-anchor"
         style={{
           display: "inline",
@@ -360,7 +440,7 @@ export function MainText({ className }: MainTextProps) {
             <span
               key={j}
               onClick={(e) =>
-                handleHighlightClick(span.parallels, e.currentTarget)
+                handleHighlightClick(real, e.currentTarget)
               }
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.filter =
@@ -413,6 +493,30 @@ export function MainText({ className }: MainTextProps) {
   const CITATION_PREFIX_RE =
     /^[\s，。；：、！？」』]*(?:《[^《》]*》|（[^（）]*）)+[，。；：、！？」』]*|^\s*[，。；：、！？」』]+/;
 
+  /** Annotation mode: anchor the current text selection to the underlying
+   *  data text and open the annotation editor for it. */
+  const handleAnnotationSelection = () => {
+    if (!state.annotationMode) return;
+    if (!rhymedActive && state.language !== "zh") return; // zh offsets only
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    const raw = sel.toString().trim();
+    if (!raw) return;
+    const dataText = rhymedActive ? (rhymed?.text ?? "") : chapter.text.zh;
+    const quote = anchorQuote(raw, dataText);
+    if (!quote) {
+      show("Couldn't anchor the selection — try selecting passage text.", 2200);
+      return;
+    }
+    // ponytail: first occurrence wins; add an occurrence index if it matters
+    const start = dataText.indexOf(quote);
+    setAnnotationSegmentId(
+      `sel:${rhymedActive ? "r" : "p"}:${start}-${start + quote.length}`,
+    );
+    setAnnotationOpen(true);
+    sel.removeAllRanges();
+  };
+
   /** Small inline badge on highlights that carry saved annotations. */
   const annotationBadge = (segmentId: string, key: string) => {
     const count = countForSegment(segmentId);
@@ -460,13 +564,29 @@ export function MainText({ className }: MainTextProps) {
     for (let i = 0; i < spanList.length; i++) {
       const span = spanList[i];
       out.push(renderSpan(span, i, isProseZh));
-      const badge =
-        span.parallels.length > 0
-          ? annotationBadge(span.parallels[0].segmentId, `ann-${i}`)
-          : null;
+      const real = span.parallels.filter(
+        (p) => p.textId !== ANNOTATION_TEXT_ID,
+      );
+      const badges: ReactNode[] = [];
+      if (real.length > 0) {
+        const b = annotationBadge(real[0].segmentId, `ann-${i}`);
+        if (b) badges.push(b);
+      }
+      // Selection-annotation badge only where the underlined range ends,
+      // so ranges split across several spans get a single badge.
+      span.parallels
+        .filter(
+          (p) =>
+            p.textId === ANNOTATION_TEXT_ID &&
+            !spanList[i + 1]?.parallels.includes(p),
+        )
+        .forEach((p, k) => {
+          const b = annotationBadge(p.segmentId, `ann-sel-${i}-${k}`);
+          if (b) badges.push(b);
+        });
       const label = footnoteLabelOf(span);
       if (label === null) {
-        if (badge) out.push(badge);
+        out.push(...badges);
         continue;
       }
       const sup = (
@@ -488,7 +608,7 @@ export function MainText({ className }: MainTextProps) {
             </span>,
             sup,
           );
-          if (badge) out.push(badge);
+          out.push(...badges);
           const rest = display.slice(m[0].length);
           if (rest) out.push(<span key={`rest-${i}`}>{rest}</span>);
           i++; // next span consumed
@@ -496,7 +616,7 @@ export function MainText({ className }: MainTextProps) {
         }
       }
       out.push(sup);
-      if (badge) out.push(badge);
+      out.push(...badges);
     }
     return out;
   };
@@ -605,6 +725,7 @@ export function MainText({ className }: MainTextProps) {
         </header>
         <div
           id="main-text-container"
+          onMouseUp={handleAnnotationSelection}
           style={{
             fontFamily:
               state.language === "zh"
@@ -673,7 +794,8 @@ export function MainText({ className }: MainTextProps) {
             boxShadow: "var(--shadow-popover)",
           }}
         >
-          Annotation mode — click a highlighted parallel to add a note.
+          Annotation mode — click a highlight or select any text to add a
+          note.
         </div>
       )}
       <AnnotationPopover
