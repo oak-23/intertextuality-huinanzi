@@ -604,6 +604,7 @@ export function MainText({ className }: MainTextProps) {
           />
         </header>
         <div
+          id="main-text-container"
           style={{
             fontFamily:
               state.language === "zh"

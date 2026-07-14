@@ -1,11 +1,27 @@
 import { sampleContinuousMainText, sampleParallelTexts } from '../data/newData';
-import { sampleMainText } from '../data/sampleData';
 import type { ITextRepository } from '../repositories/types';
 import type { Chapter, ContinuousChapter, ContinuousText, Language, SearchResult, SearchScope, Segment, Text } from '../types';
 
+/**
+ * Derive a minimal segmented Text from the continuous main text.
+ * Chapters have empty segment arrays since the main text is rendered
+ * as continuous prose, not discrete segments.
+ */
+function deriveMainText(continuous: ContinuousText): Text {
+  return {
+    id: continuous.id,
+    title: continuous.title,
+    chapters: continuous.chapters.map((ch) => ({
+      id: ch.id,
+      title: ch.title,
+      segments: [],
+    })),
+  };
+}
+
 export class LocalTextAdapter implements ITextRepository {
-  private readonly main: Text = sampleMainText;
   private readonly continuous: ContinuousText = sampleContinuousMainText;
+  private readonly main: Text = deriveMainText(sampleContinuousMainText);
   private readonly parallels: Text[] = sampleParallelTexts;
   private readonly parallelsById: Map<string, Text> = new Map(
     sampleParallelTexts.map((t) => [t.id, t])
@@ -50,23 +66,34 @@ export class LocalTextAdapter implements ITextRepository {
     if (!needle) return [];
     const results: SearchResult[] = [];
 
-    if (scope === 'main') {
-      // Search continuous text
+    if (scope === 'main' || scope === 'all') {
+      // Search continuous text — find ALL occurrences across all chapters
       for (const chapter of this.continuous.chapters) {
         const body = chapter.text[lang] ?? '';
-        if (body.includes(needle)) {
+        let from = 0;
+        let occurrenceIndex = 0;
+        while (from < body.length) {
+          const idx = body.indexOf(needle, from);
+          if (idx === -1) break;
+          const contextStart = Math.max(0, idx - 40);
+          const contextEnd = Math.min(body.length, idx + needle.length + 40);
           results.push({
             textId: this.continuous.id,
             chapterId: chapter.id,
-            segmentId: '',
-            matchedText: body.substring(
-              Math.max(0, body.indexOf(needle) - 40),
-              Math.min(body.length, body.indexOf(needle) + needle.length + 40)
-            ),
+            segmentId: `match-${chapter.id}-${idx}`,
+            matchedText: body.substring(contextStart, contextEnd),
+            matchOffset: idx,
+            matchLength: needle.length,
+            matchIndex: occurrenceIndex,
+            matchQuery: needle,
           });
+          from = idx + needle.length;
+          occurrenceIndex++;
         }
       }
-    } else {
+    }
+    
+    if (scope === 'parallel' || scope === 'all') {
       // Search parallel texts by segments
       for (const parallel of this.parallels) {
         for (const chapter of parallel.chapters) {
