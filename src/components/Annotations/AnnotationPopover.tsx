@@ -9,35 +9,58 @@ export interface AnnotationPopoverProps {
   open: boolean;
   onClose: () => void;
   chapterId: string;
-  segmentId: string | null;
+  segmentId?: string | null;
+  annotationId?: string | null;
+  newSelection?: {
+    startIndex: number;
+    endIndex: number;
+    language: "zh" | "en";
+    selectedText: string;
+  } | null;
 }
 
-export function AnnotationPopover({ open, onClose, chapterId, segmentId }: AnnotationPopoverProps) {
-  const { forSegment, save, remove, update } = useAnnotations(chapterId);
+export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotationId, newSelection }: AnnotationPopoverProps) {
+  const { forSegment, getAnnotationById, save, remove, update } = useAnnotations(chapterId);
   const { loggedIn } = useAuth();
-  const { state } = useApp();
+  const { state, toggleAnnotationMode } = useApp();
   const [text, setText] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
 
   const existing: Annotation[] = segmentId ? forSegment(segmentId) : [];
+  const singleAnnotation = annotationId ? getAnnotationById(annotationId) : null;
 
   useEffect(() => {
-    setText('');
-    setEditing(null);
-  }, [segmentId, open]);
+    if (singleAnnotation) {
+      setText(singleAnnotation.comment);
+      setEditing(singleAnnotation.id);
+    } else {
+      setText('');
+      setEditing(null);
+    }
+  }, [segmentId, annotationId, singleAnnotation, open]);
 
   const handleSave = () => {
-    if (!segmentId) return;
     const value = text.trim();
     if (!value) return;
     if (editing) {
       update(editing, value);
-    } else {
+    } else if (newSelection) {
+      save({
+        comment: value,
+        startIndex: newSelection.startIndex,
+        endIndex: newSelection.endIndex,
+        language: newSelection.language,
+        selectedText: newSelection.selectedText,
+      });
+    } else if (segmentId) {
       save({ segmentId, comment: value });
     }
     setText('');
     setEditing(null);
-    if (!editing) onClose();
+    if (!editing || singleAnnotation) onClose();
+    if (state.annotationMode) {
+      toggleAnnotationMode();
+    }
   };
 
   return (
@@ -65,6 +88,22 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId }: Annot
           >
             Notes are stored on this device.
           </p>
+        )}
+        {(newSelection?.selectedText || singleAnnotation?.selectedText) && (
+          <div
+            style={{
+              padding: '8px 12px',
+              backgroundColor: 'var(--color-surface-low)',
+              borderRadius: 'var(--radius-button)',
+              borderLeft: '3px solid var(--color-accent)',
+              fontFamily: 'var(--font-serif)',
+              fontSize: 15,
+              color: 'var(--color-text-secondary)',
+              fontStyle: 'italic',
+            }}
+          >
+            "{newSelection?.selectedText || singleAnnotation?.selectedText}"
+          </div>
         )}
         <textarea
           rows={4}
@@ -163,11 +202,30 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId }: Annot
             ))}
           </ul>
         )}
+        {singleAnnotation && !existing.length && (
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => {
+                remove(singleAnnotation.id);
+                onClose();
+              }}
+              style={{
+                fontSize: 13,
+                color: 'var(--color-error)',
+                background: 'none',
+                border: 'none',
+              }}
+            >
+              Delete Annotation
+            </button>
+          </div>
+        )}
         <div className="flex justify-end gap-2" style={{ marginTop: 4 }}>
           <button
             type="button"
             onClick={() => {
-              if (editing) {
+              if (editing && !singleAnnotation) {
                 setEditing(null);
                 setText('');
               } else {

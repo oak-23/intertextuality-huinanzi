@@ -17,7 +17,8 @@ export type ColorKey =
   | "shenzi"
   | "zhanguoce"
   | "lunyu"
-  | "mengzi";
+  | "mengzi"
+  | "annotation";
 
 export interface BiLingual {
   zh: string;
@@ -131,10 +132,15 @@ export interface Text {
 
 export interface Annotation {
   id: string;
-  segmentId: string;
   chapterId: string;
+  segmentId?: string;
   comment: string;
   createdAt: string;
+  
+  startIndex?: number;
+  endIndex?: number;
+  language?: "zh" | "en";
+  selectedText?: string;
 }
 
 export interface SearchResult {

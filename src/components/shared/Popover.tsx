@@ -15,6 +15,8 @@ export interface PopoverProps {
   children: ReactNode;
   /** Optional aria-label. */
   ariaLabel?: string;
+  /** Optional custom styles to merge onto the popover container. */
+  style?: CSSProperties;
 }
 
 export function Popover({
@@ -26,6 +28,7 @@ export function Popover({
   width,
   children,
   ariaLabel,
+  style: customStyle,
 }: PopoverProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
@@ -100,6 +103,7 @@ export function Popover({
     opacity: position ? 1 : 0,
     transition: 'opacity 150ms ease',
     zIndex: 80,
+    ...customStyle,
   };
 
   return (
