@@ -23,9 +23,8 @@
 }
 
 /*
- * Tokens are written by ThemeContext on viewMode change.
- * Defaults here mirror src/design/tokens.ts so the page renders sanely
- * before React hydrates.
+ * Single source of truth for color tokens. ThemeContext stamps
+ * data-theme="light|dark" on <html>; the dark palette below overrides these.
  */
 :root {
   --color-primary: #1a1c1d;
@@ -53,19 +52,31 @@
   --color-dot-zhuangzi: #4caf50;
   --color-dot-lushi-chunqiu: #2196f3;
   --color-dot-wenzi: #9c27b0;
-  --color-dot-guanzi: #ff9800;
-  --color-dot-hanfeizi: #009688;
+  --color-dot-guanzi: #e53935;
+  --color-dot-hanfeizi: #8e8e93;
   --color-dot-shanhaijing: #e91e63;
   --color-dot-shiji: #ffc107;
+  --color-dot-xunzi: #795548;
+  --color-dot-liji: #b7dd2d;
+  --color-dot-shenzi: #f6b100;
+  --color-dot-zhanguoce: #009688;
+  --color-dot-lunyu: #607d8b;
+  --color-dot-mengzi: #0b8043;
 
   --color-highlight-laozi: #ffccb9;
   --color-highlight-zhuangzi: #b7dfb9;
   --color-highlight-lushi-chunqiu: #a6d5fa;
   --color-highlight-wenzi: #d7a8df;
-  --color-highlight-guanzi: #ffd599;
-  --color-highlight-hanfeizi: #99d5cf;
+  --color-highlight-guanzi: #ffcdd2;
+  --color-highlight-hanfeizi: #e3e3e6;
   --color-highlight-shanhaijing: #f6a5c0;
   --color-highlight-shiji: #ffe69b;
+  --color-highlight-xunzi: #bcaaa4;
+  --color-highlight-liji: #d3ff39;
+  --color-highlight-shenzi: #ffe9a8;
+  --color-highlight-zhanguoce: #b2dfdb;
+  --color-highlight-lunyu: #cfd8dc;
+  --color-highlight-mengzi: #d2efd6;
   --color-highlight-annotation: rgba(255, 235, 120, 0.4);
 
   --top-bar-height: 56px;
@@ -94,6 +105,51 @@
   --zh-body-line-height: 2;
   --en-body-size: 16px;
   --en-body-line-height: 1.8;
+}
+
+/* Dark palette. Highlights become translucent tints of each source's hue so
+ * the light body text stays readable over them. */
+:root[data-theme='dark'] {
+  --color-primary: #e8e8ea;
+  --color-primary-strong: #ffffff;
+  --color-secondary: #b6b6bc;
+  --color-muted: #8e8e93;
+  --color-accent: #3b8def;
+  --color-accent-bright: #5ea1f7;
+  --color-accent-pressed: #2f7bd6;
+  --color-background: #151517;
+  --color-surface: #1c1c1f;
+  --color-surface-low: #232327;
+  --color-surface-container: #2a2a2f;
+  --color-surface-high: #333338;
+  --color-border: #3f3f46;
+  --color-border-strong: #8a8a91;
+  --color-success: #30d158;
+  --color-error: #ff6961;
+  --color-text-primary: #e8e8ea;
+  --color-text-secondary: #b6b6bc;
+  --color-text-muted: #8e8e93;
+  --color-text-inverse: #ffffff;
+
+  --color-highlight-laozi: rgba(255, 127, 80, 0.32);
+  --color-highlight-zhuangzi: rgba(76, 175, 80, 0.32);
+  --color-highlight-lushi-chunqiu: rgba(33, 150, 243, 0.32);
+  --color-highlight-wenzi: rgba(156, 39, 176, 0.38);
+  --color-highlight-guanzi: rgba(229, 57, 53, 0.32);
+  --color-highlight-hanfeizi: rgba(142, 142, 147, 0.35);
+  --color-highlight-shanhaijing: rgba(233, 30, 99, 0.32);
+  --color-highlight-shiji: rgba(255, 193, 7, 0.26);
+  --color-highlight-xunzi: rgba(121, 85, 72, 0.5);
+  --color-highlight-liji: rgba(183, 221, 45, 0.26);
+  --color-highlight-shenzi: rgba(246, 177, 0, 0.26);
+  --color-highlight-zhanguoce: rgba(0, 150, 136, 0.35);
+  --color-highlight-lunyu: rgba(96, 125, 139, 0.4);
+  --color-highlight-mengzi: rgba(11, 128, 67, 0.4);
+  --color-highlight-annotation: rgba(255, 235, 120, 0.22);
+
+  --shadow-popover: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 4px 24px rgba(0, 0, 0, 0.55);
+  --shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 * {

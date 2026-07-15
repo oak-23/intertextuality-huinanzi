@@ -11,8 +11,6 @@ export function RhymedProseToggle({ className }: RhymedProseToggleProps) {
   const { available } = useRhymedView();
   const { show } = useToast();
 
-  if (state.viewMode !== 'research') return null;
-
   const flip = () => {
     const next = state.displayMode === 'rhymed' ? 'prose' : 'rhymed';
     if (next === 'rhymed' && !available) {

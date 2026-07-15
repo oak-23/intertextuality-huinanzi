@@ -1,13 +1,10 @@
 import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
+import { useAnnotations } from "../../hooks/useAnnotations";
 import { useRhymedView } from "../../hooks/useRhymedView";
 import { ParallelListItem } from "./ParallelListItem";
-import {
-  LENGTH_MIN_OPEN,
-  LENGTH_MAX_OPEN,
-  withinLengthRange,
-} from "../../utils/parallelFilters";
+import { withinLengthRange } from "../../utils/parallelFilters";
 import type { ColorKey } from "../../types";
 
 export interface ParallelListProps {
@@ -26,6 +23,7 @@ interface TitleGroup {
 export function ParallelList({ className }: ParallelListProps) {
   const { texts } = useRepositories();
   const { state, openParallelList, toggleTextHighlight } = useApp();
+  const { annotations } = useAnnotations(state.activeChapterId);
 
   const { chapter: continuousChapter, activeParallels } = useRhymedView();
 
@@ -35,9 +33,8 @@ export function ParallelList({ className }: ParallelListProps) {
   // the merged list length shown in the right panel.
   const groups = useMemo<TitleGroup[]>(() => {
     if (!continuousChapter) return [];
-    const research = state.viewMode === "research";
-    const lo = research ? state.lengthMin : LENGTH_MIN_OPEN;
-    const hi = research ? state.lengthMax : LENGTH_MAX_OPEN;
+    const lo = state.lengthMin;
+    const hi = state.lengthMax;
     const map = new Map<string, TitleGroup>();
     const seenRange = new Set<string>(); // "textId:start:end"
     for (const p of activeParallels) {
@@ -67,7 +64,6 @@ export function ParallelList({ className }: ParallelListProps) {
     continuousChapter,
     activeParallels,
     texts,
-    state.viewMode,
     state.lengthMin,
     state.lengthMax,
   ]);
@@ -95,6 +91,20 @@ export function ParallelList({ className }: ParallelListProps) {
             </li>
           );
         })}
+        {annotations.length > 0 && (
+          <li key="annotations">
+            <ParallelListItem
+              colorKey="annotation"
+              titleZh="註釋"
+              titleEn="Annotations"
+              count={annotations.length}
+              isActive={false}
+              isOn={!state.hiddenTexts.includes("annotation")}
+              onOpen={() => {}}
+              onToggle={() => toggleTextHighlight("annotation")}
+            />
+          </li>
+        )}
       </ul>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   type Dispatch,
   type ReactNode,
 } from "react";
-import type { Language, DisplayMode, ViewMode, SearchScope } from "../types";
+import type { Language, DisplayMode, Theme, SearchScope } from "../types";
 import { LENGTH_MIN_OPEN, LENGTH_MAX_OPEN } from "../utils/parallelFilters";
 
 export interface ParallelPanelState {
@@ -35,7 +35,7 @@ export interface AuthState {
 export interface AppState {
   language: Language;
   displayMode: DisplayMode;
-  viewMode: ViewMode;
+  theme: Theme;
   sidebarOpen: boolean;
   activeChapterId: string;
   selectedSegmentId: string | null;
@@ -49,9 +49,9 @@ export interface AppState {
   hiddenTexts: string[];
   /** When set, the right panel shows the numbered parallel list for this source text. */
   parallelListTextId: string | null;
-  /** When true (research mode only), bracketed parallel-title citations are hidden in the main text. */
+  /** When true, bracketed parallel-title citations are hidden in the main text. */
   hideParallelTitles: boolean;
-  /** Research-mode length filter: only parallels whose Chinese-character span is
+  /** Length filter: only parallels whose Chinese-character span is
    * within [lengthMin, lengthMax] are highlighted/listed. Open sentinels = no limit. */
   lengthMin: number;
   lengthMax: number;
@@ -60,7 +60,7 @@ export interface AppState {
 export type AppAction =
   | { type: "SET_LANGUAGE"; language: Language }
   | { type: "SET_DISPLAY_MODE"; displayMode: DisplayMode }
-  | { type: "SET_VIEW_MODE"; viewMode: ViewMode }
+  | { type: "TOGGLE_THEME" }
   | { type: "TOGGLE_SIDEBAR" }
   | { type: "SET_SIDEBAR"; open: boolean }
   | { type: "SET_ACTIVE_CHAPTER"; chapterId: string }
@@ -84,8 +84,8 @@ export type AppAction =
 
 export const initialAppState: AppState = {
   language: "zh",
-  displayMode: "rhymed",
-  viewMode: "normal",
+  displayMode: "prose",
+  theme: "light",
   sidebarOpen: true,
   activeChapterId: "chap-1",
   selectedSegmentId: null,
@@ -108,8 +108,8 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, language: action.language };
     case "SET_DISPLAY_MODE":
       return { ...state, displayMode: action.displayMode };
-    case "SET_VIEW_MODE":
-      return { ...state, viewMode: action.viewMode };
+    case "TOGGLE_THEME":
+      return { ...state, theme: state.theme === "light" ? "dark" : "light" };
     case "TOGGLE_SIDEBAR":
       return { ...state, sidebarOpen: !state.sidebarOpen };
     case "SET_SIDEBAR":
@@ -207,7 +207,7 @@ export interface AppContextValue {
   // Convenience action creators
   setLanguage: (language: Language) => void;
   setDisplayMode: (mode: DisplayMode) => void;
-  setViewMode: (mode: ViewMode) => void;
+  toggleTheme: () => void;
   toggleSidebar: () => void;
   setActiveChapter: (chapterId: string) => void;
   selectSegment: (segmentId: string | null) => void;
@@ -247,8 +247,8 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       dispatch({ type: "SET_DISPLAY_MODE", displayMode: mode }),
     [],
   );
-  const setViewMode = useCallback(
-    (mode: ViewMode) => dispatch({ type: "SET_VIEW_MODE", viewMode: mode }),
+  const toggleTheme = useCallback(
+    () => dispatch({ type: "TOGGLE_THEME" }),
     [],
   );
   const toggleSidebar = useCallback(
@@ -321,7 +321,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       dispatch,
       setLanguage,
       setDisplayMode,
-      setViewMode,
+      toggleTheme,
       toggleSidebar,
       setActiveChapter,
       selectSegment,
@@ -342,7 +342,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       state,
       setLanguage,
       setDisplayMode,
-      setViewMode,
+      toggleTheme,
       toggleSidebar,
       setActiveChapter,
       selectSegment,

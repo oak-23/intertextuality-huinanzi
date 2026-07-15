@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
-import { getTheme, themeToCssVars } from '../design/themes';
-import type { Tokens } from '../design/tokens';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { tokens, type Tokens } from '../design/tokens';
 import { useApp } from './AppContext';
 
 const ThemeContext = createContext<Tokens | null>(null);
@@ -9,20 +8,20 @@ export interface ThemeProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Stamps the current theme ("light" | "dark") onto <html> as data-theme.
+ * All color tokens live in index.css; the dark palette is the
+ * `:root[data-theme='dark']` override block there.
+ */
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const { state } = useApp();
-  const theme = useMemo(() => getTheme(state.viewMode), [state.viewMode]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const vars = themeToCssVars(theme);
-    const root = document.documentElement;
-    for (const [key, value] of Object.entries(vars)) {
-      root.style.setProperty(key, value);
-    }
-  }, [theme]);
+    document.documentElement.dataset.theme = state.theme;
+  }, [state.theme]);
 
-  return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
+  return <ThemeContext.Provider value={tokens}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme(): Tokens {

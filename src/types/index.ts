@@ -1,6 +1,6 @@
 export type Language = "zh" | "en";
 export type DisplayMode = "prose" | "rhymed";
-export type ViewMode = "normal" | "research";
+export type Theme = "light" | "dark";
 export type SearchScope = "all" | "main" | "parallel";
 
 export type ColorKey =

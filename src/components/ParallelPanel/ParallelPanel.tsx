@@ -4,11 +4,7 @@ import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { useRhymedView } from "../../hooks/useRhymedView";
 import { MultiParallelPopover } from "../MainText/MultiParallelPopover";
-import {
-  LENGTH_MIN_OPEN,
-  LENGTH_MAX_OPEN,
-  withinLengthRange,
-} from "../../utils/parallelFilters";
+import { withinLengthRange } from "../../utils/parallelFilters";
 import type { InlineParallel, ParallelOption } from "../../types";
 // ParallelPanel reads token-defined CSS vars only — no hardcoded hex.
 
@@ -136,9 +132,8 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
   // --- List mode data ---
   const listText = listTextId ? texts.getParallelText(listTextId) : null;
   const { chapter: continuousChapter, activeParallels } = useRhymedView();
-  const research = state.viewMode === "research";
-  const lenLo = research ? state.lengthMin : LENGTH_MIN_OPEN;
-  const lenHi = research ? state.lengthMax : LENGTH_MAX_OPEN;
+  const lenLo = state.lengthMin;
+  const lenHi = state.lengthMax;
   const listItems: InlineParallel[] =
     listTextId && continuousChapter
       ? activeParallels

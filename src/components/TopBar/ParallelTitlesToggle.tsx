@@ -9,8 +9,6 @@ export interface ParallelTitlesToggleProps {
 export function ParallelTitlesToggle({ className }: ParallelTitlesToggleProps) {
   const { state, toggleParallelTitles } = useApp();
 
-  if (state.viewMode !== 'research') return null;
-
   const hidden = state.hideParallelTitles;
   return (
     <IconButton

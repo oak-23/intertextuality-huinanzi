@@ -7,11 +7,7 @@ import { useAnnotations } from "../../hooks/useAnnotations";
 import { useToast } from "../shared/Toast";
 import { AnnotationPopover } from "../Annotations/AnnotationPopover";
 import { MultiParallelPopover } from "./MultiParallelPopover";
-import {
-  LENGTH_MIN_OPEN,
-  LENGTH_MAX_OPEN,
-  withinLengthRange,
-} from "../../utils/parallelFilters";
+import { withinLengthRange } from "../../utils/parallelFilters";
 import { normalizeCitationKey, citationZhByKey } from "../../data/citationTitles";
 import type { InlineParallel, ParallelOption, RhymedLine } from "../../types";
 
@@ -169,13 +165,12 @@ export function MainText({ className }: MainTextProps) {
     const fullText =
       state.language === "zh" ? chapter.text.zh : chapter.text.en;
     const hidden = new Set(state.hiddenTexts);
-    const research = state.viewMode === "research";
-    const lo = research ? state.lengthMin : LENGTH_MIN_OPEN;
-    const hi = research ? state.lengthMax : LENGTH_MAX_OPEN;
+    const lo = state.lengthMin;
+    const hi = state.lengthMax;
     const visible = chapter.inlineParallels.filter(
       (p) => !hidden.has(p.textId) && withinLengthRange(p, lo, hi),
     );
-    const annotationParallels: InlineParallel[] = annotations
+    const annotationParallels: InlineParallel[] = (hidden.has('annotation') ? [] : annotations)
       .filter(a => a.language === state.language && a.startIndex !== undefined && a.endIndex !== undefined)
       .map(a => ({
         startZh: a.language === 'zh' ? a.startIndex! : -1,
@@ -193,7 +188,6 @@ export function MainText({ className }: MainTextProps) {
     rhymedActive,
     state.language,
     state.hiddenTexts,
-    state.viewMode,
     state.lengthMin,
     state.lengthMax,
     annotations,
@@ -237,8 +231,7 @@ export function MainText({ className }: MainTextProps) {
     state.lengthMax,
   ]);
 
-  const hideBrackets =
-    state.viewMode === "research" && state.hideParallelTitles;
+  const hideBrackets = state.hideParallelTitles;
 
   const handleHighlightClick = useCallback(
     (parallels: InlineParallel[], anchor: HTMLElement) => {
@@ -513,6 +506,7 @@ export function MainText({ className }: MainTextProps) {
 
   /** Small inline badge on highlights that carry saved annotations. */
   const annotationBadge = (segmentId: string, key: string) => {
+    if (state.hiddenTexts.includes("annotation")) return null;
     const count = countForSegment(segmentId);
     if (count === 0) return null;
     return (

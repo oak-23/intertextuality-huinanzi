@@ -13,7 +13,7 @@ const clamp = (v: number, lo: number, hi: number) =>
   Math.min(hi, Math.max(lo, v));
 
 /**
- * Research-mode control that filters main-text highlights by the Chinese-character
+ * Filters main-text highlights by the Chinese-character
  * length of each parallel. The track bounds are derived from the current chapter's
  * actual parallel lengths; dragging a handle to an extreme stores the open sentinel
  * so "no limit" persists across chapters.
@@ -40,7 +40,6 @@ export function ParallelLengthFilter() {
     };
   }, [activeParallels]);
 
-  if (state.viewMode !== "research") return null;
   if (dataMax <= dataMin) return null; // nothing meaningful to filter
 
   const low = clamp(state.lengthMin, dataMin, dataMax);
