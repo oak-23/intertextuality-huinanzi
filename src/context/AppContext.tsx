@@ -36,6 +36,8 @@ export interface AppState {
   language: Language;
   displayMode: DisplayMode;
   theme: Theme;
+  /** Entry screen showing all chapters from a distance; a chapter click zooms in. */
+  overviewOpen: boolean;
   sidebarOpen: boolean;
   activeChapterId: string;
   selectedSegmentId: string | null;
@@ -61,6 +63,7 @@ export type AppAction =
   | { type: "SET_LANGUAGE"; language: Language }
   | { type: "SET_DISPLAY_MODE"; displayMode: DisplayMode }
   | { type: "TOGGLE_THEME" }
+  | { type: "CLOSE_OVERVIEW" }
   | { type: "TOGGLE_SIDEBAR" }
   | { type: "SET_SIDEBAR"; open: boolean }
   | { type: "SET_ACTIVE_CHAPTER"; chapterId: string }
@@ -86,6 +89,7 @@ export const initialAppState: AppState = {
   language: "zh",
   displayMode: "prose",
   theme: "light",
+  overviewOpen: true,
   sidebarOpen: true,
   activeChapterId: "chap-1",
   selectedSegmentId: null,
@@ -110,6 +114,8 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, displayMode: action.displayMode };
     case "TOGGLE_THEME":
       return { ...state, theme: state.theme === "light" ? "dark" : "light" };
+    case "CLOSE_OVERVIEW":
+      return { ...state, overviewOpen: false };
     case "TOGGLE_SIDEBAR":
       return { ...state, sidebarOpen: !state.sidebarOpen };
     case "SET_SIDEBAR":
@@ -208,6 +214,7 @@ export interface AppContextValue {
   setLanguage: (language: Language) => void;
   setDisplayMode: (mode: DisplayMode) => void;
   toggleTheme: () => void;
+  closeOverview: () => void;
   toggleSidebar: () => void;
   setActiveChapter: (chapterId: string) => void;
   selectSegment: (segmentId: string | null) => void;
@@ -249,6 +256,10 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
   );
   const toggleTheme = useCallback(
     () => dispatch({ type: "TOGGLE_THEME" }),
+    [],
+  );
+  const closeOverview = useCallback(
+    () => dispatch({ type: "CLOSE_OVERVIEW" }),
     [],
   );
   const toggleSidebar = useCallback(
@@ -322,6 +333,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       setLanguage,
       setDisplayMode,
       toggleTheme,
+      closeOverview,
       toggleSidebar,
       setActiveChapter,
       selectSegment,
@@ -343,6 +355,7 @@ export function AppProvider({ children, initialState }: AppProviderProps) {
       setLanguage,
       setDisplayMode,
       toggleTheme,
+      closeOverview,
       toggleSidebar,
       setActiveChapter,
       selectSegment,

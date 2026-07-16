@@ -6,6 +6,7 @@ import { MainText } from './components/MainText/MainText';
 import { ParallelPanel } from './components/ParallelPanel/ParallelPanel';
 import { CommandPalette } from './components/CommandPalette/CommandPalette';
 import { ZoomControl } from './components/ZoomControl/ZoomControl';
+import { ChapterOverview } from './components/ChapterOverview/ChapterOverview';
 
 export function App() {
   const { state, closeParallel, closeParallelList } = useApp();
@@ -73,6 +74,7 @@ export function App() {
       </div>
       <ZoomControl />
       <CommandPalette open={paletteOpen} onClose={closePalette} />
+      {state.overviewOpen && <ChapterOverview />}
     </div>
   );
 }
