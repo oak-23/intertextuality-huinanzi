@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useChapterNavigation } from '../../hooks/useChapterNavigation';
 import { Popover } from '../shared/Popover';
 import { IconButton } from './IconButton';
+import { formatTitleEn } from '../../utils/titles';
 
 export interface ChapterSelectorProps {
   className?: string;
@@ -152,16 +153,16 @@ export function ChapterSelector({ className }: ChapterSelectorProps) {
                           fontWeight: active ? 600 : 500,
                         }}
                       >
-                        {chapter.title.zh}
+                        {formatTitleEn(chapter.title.en)}
                       </div>
                       <div
                         style={{
-                          fontFamily: 'var(--font-ui)',
-                          fontSize: 12,
+                          fontFamily: 'var(--font-zh-body)',
+                          fontSize: 16,
                           color: 'var(--color-secondary)',
                         }}
                       >
-                        {chapter.title.en}
+                        {chapter.title.zh}
                       </div>
                     </div>
                     {active && (

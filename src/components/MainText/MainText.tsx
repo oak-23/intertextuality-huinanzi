@@ -8,6 +8,7 @@ import { useToast } from "../shared/Toast";
 import { AnnotationPopover } from "../Annotations/AnnotationPopover";
 import { MultiParallelPopover } from "./MultiParallelPopover";
 import { splitIntoSpans, type TextSpan } from "./spans";
+import { chapterOrdinal, formatTitleEn } from "../../utils/titles";
 import { withinLengthRange } from "../../utils/parallelFilters";
 import { normalizeCitationKey, citationZhByKey } from "../../data/citationTitles";
 import type { InlineParallel, ParallelOption, RhymedLine } from "../../types";
@@ -83,6 +84,9 @@ export function MainText({ className }: MainTextProps) {
   const chapter =
     continuousText?.chapters.find((c) => c.id === state.activeChapterId) ??
     null;
+  // ponytail: derived from the "chap-N" id instead of searching the chapters
+  // array — the React Compiler treats array methods on it as possible mutation.
+  const chapterIndex = Number(state.activeChapterId.split("-").pop()) - 1;
 
   const spans = useMemo(() => {
     if (!chapter || rhymedActive) return [];
@@ -563,55 +567,63 @@ export function MainText({ className }: MainTextProps) {
       >
         <header className="mb-12 text-center">
           <p
+            className="font-serif"
             style={{
-              fontFamily: "var(--font-ui)",
-              fontWeight: 500,
-              fontSize: 12,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "var(--color-secondary)",
-              marginBottom: 12,
+              fontSize: 30,
+              fontWeight: 400,
+              lineHeight: 1.2,
+              marginBottom: 20,
+              color: "var(--color-text-primary)",
+            }}
+          >
+            Chapter {chapterOrdinal(chapterIndex)}
+          </p>
+          <h1
+            className="font-serif italic"
+            style={{
+              fontSize: 26,
+              fontWeight: 400,
+              lineHeight: 1.2,
+              marginBottom: 20,
+              color: "var(--color-text-primary)",
             }}
           >
             {continuousText.title.en}
-          </p>
-          <h1
-            className="font-serif"
+          </h1>
+          <p
             style={{
-              fontSize: 32,
+              fontSize: 26,
               fontFamily: "var(--font-zh-body)",
               fontWeight: 400,
-              letterSpacing: "-0.02em",
               lineHeight: 1.2,
-              marginBottom: 16,
+              marginBottom: 20,
               color: "var(--color-text-primary)",
             }}
           >
             {continuousText.title.zh}
-          </h1>
+          </p>
           <h2
             className="font-serif"
             style={{
-              fontSize: 24,
+              fontSize: 26,
+              fontWeight: 400,
+              lineHeight: 1.3,
+              marginBottom: 20,
+              color: "var(--color-text-primary)",
+            }}
+          >
+            {formatTitleEn(chapterTitle.en)}
+          </h2>
+          <p
+            style={{
+              fontSize: 26,
               fontFamily: "var(--font-zh-body)",
               fontWeight: 400,
-              letterSpacing: "-0.01em",
+              lineHeight: 1.2,
               color: "var(--color-text-primary)",
             }}
           >
             {chapterTitle.zh}
-          </h2>
-          <p
-            className="font-serif italic"
-            style={{
-              fontSize: 16,
-              fontWeight: 500,
-              color: "var(--color-secondary)",
-              lineHeight: 1.4,
-              marginTop: 8,
-            }}
-          >
-            {chapterTitle.en}
           </p>
           <div
             aria-hidden

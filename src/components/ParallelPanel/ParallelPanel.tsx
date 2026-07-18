@@ -5,6 +5,7 @@ import { useRepositories } from "../../context/RepositoryContext";
 import { useRhymedView } from "../../hooks/useRhymedView";
 import { MultiParallelPopover } from "../MainText/MultiParallelPopover";
 import { withinLengthRange } from "../../utils/parallelFilters";
+import { formatTitleEn } from "../../utils/titles";
 import type { InlineParallel, ParallelOption } from "../../types";
 // ParallelPanel reads token-defined CSS vars only — no hardcoded hex.
 
@@ -249,58 +250,54 @@ export function ParallelPanel({ className }: ParallelPanelProps) {
             >
               <X size={16} />
             </button>
-            <p
+            <h2
+              className="font-serif italic"
               style={{
-                fontFamily: "var(--font-ui)",
-                fontWeight: 500,
-                fontSize: 12,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--color-secondary)",
-                marginBottom: 12,
+                fontSize: 26,
+                fontWeight: 400,
+                lineHeight: 1.2,
+                marginBottom: 20,
+                color: "var(--color-text-primary)",
               }}
             >
               {text.title.en}
-            </p>
-            <h2
-              className="font-serif"
+            </h2>
+            <p
               style={{
-                fontSize: 32,
+                fontSize: 26,
                 fontFamily: "var(--font-zh-body)",
                 fontWeight: 400,
-                letterSpacing: "-0.02em",
                 lineHeight: 1.2,
-                marginBottom: chapter ? 16 : 12,
+                marginBottom: chapter ? 20 : 12,
                 color: "var(--color-text-primary)",
               }}
             >
               {text.title.zh}
-            </h2>
+            </p>
             {chapter && (
               <>
                 <h3
                   className="font-serif"
                   style={{
-                    fontSize: 24,
+                    fontSize: 26,
+                    fontWeight: 400,
+                    lineHeight: 1.3,
+                    marginBottom: 20,
+                    color: "var(--color-text-primary)",
+                  }}
+                >
+                  {formatTitleEn(chapter.title.en)}
+                </h3>
+                <p
+                  style={{
+                    fontSize: 26,
                     fontFamily: "var(--font-zh-body)",
                     fontWeight: 400,
-                    letterSpacing: "-0.01em",
+                    lineHeight: 1.2,
                     color: "var(--color-text-primary)",
                   }}
                 >
                   {chapter.title.zh}
-                </h3>
-                <p
-                  className="font-serif italic"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                    color: "var(--color-secondary)",
-                    lineHeight: 1.4,
-                    marginTop: 8,
-                  }}
-                >
-                  {chapter.title.en}
                 </p>
               </>
             )}

@@ -23,14 +23,14 @@ const huainanzi: ContinuousText = {
   chapters: [
     {
       id: "chap-1",
-      title: { zh: "原道訓", en: "Yuandao Xun — Originating in the Way" },
+      title: { zh: "原道訓", en: "Yuandao xun — Originating in the Way" },
       text: chap1Built.text,
       inlineParallels: chap1Built.inlineParallels,
       rhymed: chap1Rhymed,
     },
     {
       id: "chap-2",
-      title: { zh: "俶真訓", en: "Chuzhen Xun — Activating the Genuine" },
+      title: { zh: "俶真訓", en: "Chuzhen xun — Activating the Genuine" },
       text: chap2Built.text,
       inlineParallels: chap2Built.inlineParallels,
       rhymed: chap2Rhymed,

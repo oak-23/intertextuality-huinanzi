@@ -2,6 +2,7 @@ import { Fragment, useRef, useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { useRepositories } from "../../context/RepositoryContext";
 import { splitIntoSpans } from "../MainText/spans";
+import { chapterOrdinal, formatTitleEn } from "../../utils/titles";
 
 const ZOOM_MS = 500;
 
@@ -64,19 +65,17 @@ export function ChapterOverview() {
             color: "var(--color-text-primary)",
           }}
         >
-          {main.title.zh}
+          {main.title.en}
         </h1>
         <p
           style={{
             margin: "8px 0 0",
-            fontFamily: "var(--font-ui)",
-            fontSize: 14,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
+            fontFamily: "var(--font-zh-body)",
+            fontSize: 18,
             color: "var(--color-muted)",
           }}
         >
-          {main.title.en}
+          {main.title.zh}
         </p>
       </header>
       <div
@@ -108,35 +107,50 @@ export function ChapterOverview() {
             }}
           >
             <span
+              className="font-serif"
               style={{
-                fontFamily: "var(--font-ui)",
-                fontSize: 12,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--color-muted)",
+                fontSize: 17,
+                color: "var(--color-text-primary)",
               }}
             >
-              Chapter {i + 1}
+              Chapter {chapterOrdinal(i)}
             </span>
             <span
               className="font-serif"
               style={{
-                fontSize: 26,
-                fontWeight: 600,
+                fontSize: 17,
+                fontStyle: "italic",
+                color: "var(--color-text-primary)",
+              }}
+            >
+              {main.title.en}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-zh-body)",
+                fontSize: 17,
+                color: "var(--color-text-primary)",
+              }}
+            >
+              {main.title.zh}
+            </span>
+            <span
+              className="font-serif"
+              style={{
+                fontSize: 17,
+                color: "var(--color-text-primary)",
+              }}
+            >
+              {formatTitleEn(chapter.title.en)}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-zh-body)",
+                fontSize: 17,
                 color: "var(--color-text-primary)",
               }}
             >
               {chapter.title.zh}
-            </span>
-            <span
-              className="font-serif"
-              style={{
-                fontSize: 14,
-                fontStyle: "italic",
-                color: "var(--color-text-secondary)",
-              }}
-            >
-              {chapter.title.en}
             </span>
             <span
               aria-hidden
