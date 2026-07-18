@@ -1,4 +1,5 @@
 import { useState, type CSSProperties, type JSX } from 'react';
+import { Moon } from 'lucide-react';
 import { Modal } from '../shared/Modal';
 
 export interface TutorialModalProps {
@@ -236,13 +237,24 @@ function SceneTopBar() {
         <span style={icon} />
         <span style={icon} />
         <span style={icon} />
-        <span style={{ ...icon, backgroundColor: 'var(--color-accent)' }} />
+        <span
+          style={{
+            ...icon,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--color-secondary)',
+          }}
+        >
+          <Moon size={9} />
+        </span>
       </div>
+      {/* Tooltip hangs directly under the moon button the cursor clicks. */}
       <span
         style={{
           position: 'absolute',
           top: 36,
-          right: 58,
+          right: 8,
           padding: '4px 8px',
           borderRadius: 5,
           backgroundColor: 'var(--color-text-primary)',
@@ -356,9 +368,9 @@ const KEYFRAMES = `
 @keyframes tut3-knob { 0%,38%{transform:translateX(9px)} 46%,76%{transform:translateX(0)} 86%,100%{transform:translateX(9px)} }
 @keyframes tut3-pill { 0%,38%{background-color:var(--color-accent)} 46%,76%{background-color:var(--color-border-strong)} 86%,100%{background-color:var(--color-accent)} }
 @keyframes tut3-hl { 0%,40%{opacity:1} 48%,78%{opacity:0.12} 88%,100%{opacity:1} }
-@keyframes tut4-cur { 0%{left:50%;top:70%} 22%,48%{left:75%;top:12%} 60%,80%{left:92%;top:12%} 66%{transform:scale(.7)} 72%{transform:scale(1)} 100%{left:50%;top:70%} }
-@keyframes tut4-tip { 0%,24%{opacity:0} 32%,52%{opacity:1} 60%,100%{opacity:0} }
-@keyframes tut4-bg { 0%,64%{background-color:var(--color-surface)} 74%,92%{background-color:#232327} 100%{background-color:var(--color-surface)} }
+@keyframes tut4-cur { 0%{right:45%;top:68%;transform:scale(1)} 26%,80%{right:15px;top:9px} 54%{transform:scale(1)} 58%{transform:scale(.7)} 62%{transform:scale(1)} 94%,100%{right:45%;top:68%} }
+@keyframes tut4-tip { 0%,30%{opacity:0} 38%,54%{opacity:1} 62%,100%{opacity:0} }
+@keyframes tut4-bg { 0%,60%{background-color:var(--color-surface)} 70%,90%{background-color:#232327} 100%{background-color:var(--color-surface)} }
 @keyframes tut5-cur { 0%,10%{left:10%;top:40%} 40%{left:44%;top:40%} 55%,80%{left:44%;top:40%;opacity:1} 92%,100%{left:10%;top:40%;opacity:1} }
 @keyframes tut5-sel { 0%,10%{width:0} 40%,86%{width:64%} 96%,100%{width:0} }
 @keyframes tut5-note { 0%,44%{opacity:0;transform:scale(.85)} 54%,88%{opacity:1;transform:scale(1)} 96%,100%{opacity:0;transform:scale(.85)} }
