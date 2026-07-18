@@ -7,9 +7,11 @@ import { RhymedProseToggle } from './RhymedProseToggle';
 import { ParallelTitlesToggle } from './ParallelTitlesToggle';
 import { ChapterSelector } from './ChapterSelector';
 import { ThemeToggle } from './ThemeToggle';
+import { TutorialButton } from './TutorialButton';
 import { ReportButton } from './ReportButton';
 import { LoginButton } from './LoginButton';
 import { AnnotateButton } from './AnnotateButton';
+import { Tooltip } from '../shared/Tooltip';
 
 export interface TopBarProps {
   className?: string;
@@ -30,7 +32,9 @@ export function TopBar({ className, onSearchClick }: TopBarProps) {
       }}
     >
       <div className="flex items-center gap-4 flex-1 min-w-0">
-        <SidebarToggle />
+        <Tooltip label="Show or hide the sidebar">
+          <SidebarToggle />
+        </Tooltip>
         <span
           className="font-serif truncate"
           style={{
@@ -102,15 +106,36 @@ export function TopBar({ className, onSearchClick }: TopBarProps) {
         )}
       </div>
       <div className="flex items-center gap-2 flex-1 justify-end">
-        <SwapPanelsToggle />
-        <LanguageToggle />
-        <RhymedProseToggle />
-        <ParallelTitlesToggle />
-        <ChapterSelector />
-        <ThemeToggle />
-        <ReportButton />
-        <LoginButton />
-        <AnnotateButton />
+        <Tooltip label="Swap the text and parallel panels">
+          <SwapPanelsToggle />
+        </Tooltip>
+        <Tooltip label="Switch between 中文 and English">
+          <LanguageToggle />
+        </Tooltip>
+        <Tooltip label="Rhymed or prose version">
+          <RhymedProseToggle />
+        </Tooltip>
+        <Tooltip label="Show or hide citation brackets">
+          <ParallelTitlesToggle />
+        </Tooltip>
+        <Tooltip label="Choose a chapter">
+          <ChapterSelector />
+        </Tooltip>
+        <Tooltip label="Light or dark mode">
+          <ThemeToggle />
+        </Tooltip>
+        <Tooltip label="How to use this site">
+          <TutorialButton />
+        </Tooltip>
+        <Tooltip label="Report an issue">
+          <ReportButton />
+        </Tooltip>
+        <Tooltip label="Log in to sync your notes">
+          <LoginButton />
+        </Tooltip>
+        <Tooltip label="Add notes to the text">
+          <AnnotateButton />
+        </Tooltip>
       </div>
     </header>
   );

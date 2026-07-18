@@ -12,7 +12,6 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <IconButton
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-      title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
       onClick={toggleTheme}
       className={className}
     >

@@ -14,7 +14,6 @@ export function ParallelTitlesToggle({ className }: ParallelTitlesToggleProps) {
     <IconButton
       active={hidden}
       aria-label={`Parallel titles: ${hidden ? 'hidden' : 'shown'} — click to toggle`}
-      title={hidden ? 'Show parallel titles' : 'Hide parallel titles'}
       aria-pressed={hidden}
       onClick={toggleParallelTitles}
       className={className}

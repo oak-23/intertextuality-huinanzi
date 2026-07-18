@@ -7,10 +7,21 @@ import { ParallelPanel } from './components/ParallelPanel/ParallelPanel';
 import { CommandPalette } from './components/CommandPalette/CommandPalette';
 import { ZoomControl } from './components/ZoomControl/ZoomControl';
 import { ChapterOverview } from './components/ChapterOverview/ChapterOverview';
+import { TutorialModal } from './components/Tutorial/TutorialModal';
+
+const TUTORIAL_SEEN_KEY = 'huainanzi-tutorial-seen';
 
 export function App() {
   const { state, closeParallel, closeParallelList } = useApp();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // First visit only: the top-bar help button reopens it anytime.
+  const [tutorialOpen, setTutorialOpen] = useState(
+    () => !localStorage.getItem(TUTORIAL_SEEN_KEY),
+  );
+  const closeTutorial = useCallback(() => {
+    localStorage.setItem(TUTORIAL_SEEN_KEY, '1');
+    setTutorialOpen(false);
+  }, []);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
   const closePalette = useCallback(() => setPaletteOpen(false), []);
@@ -75,6 +86,7 @@ export function App() {
       <ZoomControl />
       <CommandPalette open={paletteOpen} onClose={closePalette} />
       {state.overviewOpen && <ChapterOverview />}
+      <TutorialModal open={tutorialOpen} onClose={closeTutorial} />
     </div>
   );
 }

@@ -12,7 +12,6 @@ export function LanguageToggle({ className }: LanguageToggleProps) {
   return (
     <IconButton
       aria-label={`Switch to ${next === 'zh' ? '中文' : 'English'}`}
-      title={`Switch to ${next === 'zh' ? '中文' : 'English'}`}
       onClick={() => setLanguage(next)}
       className={className}
     >

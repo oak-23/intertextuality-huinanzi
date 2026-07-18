@@ -44,7 +44,6 @@ export function ChapterSelector({ className }: ChapterSelectorProps) {
         ref={triggerRef}
         active={open}
         aria-label="Select chapter"
-        title="Select chapter"
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
