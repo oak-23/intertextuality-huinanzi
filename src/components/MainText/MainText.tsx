@@ -762,7 +762,7 @@ export function MainText({ className }: MainTextProps) {
               zIndex: 80,
             }}
           >
-            {hoveredAnnotation.comment}
+            <span dangerouslySetInnerHTML={{ __html: hoveredAnnotation.comment || '' }} />
           </div>
         );
       })()}

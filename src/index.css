@@ -238,3 +238,14 @@ textarea {
   80% { opacity: 0.4; }
   100% { opacity: 0; }
 }
+
+/* contentEditable placeholder */
+[contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-muted);
+  pointer-events: none;
+  font-style: normal;
+}
+[contenteditable][data-placeholder]:empty:focus::before {
+  color: var(--color-muted);
+}

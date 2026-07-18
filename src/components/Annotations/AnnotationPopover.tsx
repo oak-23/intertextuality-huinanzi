@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Modal } from '../shared/Modal';
 import { useAnnotations } from '../../hooks/useAnnotations';
 import { useAuth } from '../../hooks/useAuth';
@@ -25,6 +25,22 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
   const { state, toggleAnnotationMode } = useApp();
   const [text, setText] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+
+  const updateActiveFormats = useCallback(() => {
+    const formats = new Set<string>();
+    if (document.queryCommandState('bold')) formats.add('bold');
+    if (document.queryCommandState('italic')) formats.add('italic');
+    if (document.queryCommandState('underline')) formats.add('underline');
+    setActiveFormats(formats);
+  }, []);
+
+  const applyFormat = useCallback((command: string) => {
+    editorRef.current?.focus();
+    document.execCommand(command, false);
+    updateActiveFormats();
+  }, [updateActiveFormats]);
 
   const existing: Annotation[] = segmentId ? forSegment(segmentId) : [];
   const singleAnnotation = annotationId ? getAnnotationById(annotationId) : null;
@@ -33,15 +49,21 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
     if (singleAnnotation) {
       setText(singleAnnotation.comment);
       setEditing(singleAnnotation.id);
+      if (editorRef.current) editorRef.current.innerHTML = singleAnnotation.comment;
     } else {
       setText('');
       setEditing(null);
+      if (editorRef.current) editorRef.current.innerHTML = '';
     }
   }, [segmentId, annotationId, singleAnnotation, open]);
 
+  const getEditorContent = useCallback(() => {
+    return editorRef.current?.innerHTML?.trim() || '';
+  }, []);
+
   const handleSave = () => {
-    const value = text.trim();
-    if (!value) return;
+    const value = getEditorContent();
+    if (!value || value === '<br>') return;
     if (editing) {
       update(editing, value);
     } else if (newSelection) {
@@ -56,6 +78,7 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
       save({ segmentId, comment: value });
     }
     setText('');
+    if (editorRef.current) editorRef.current.innerHTML = '';
     setEditing(null);
     if (!editing || singleAnnotation) onClose();
     if (state.annotationMode) {
@@ -72,23 +95,26 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
       ariaLabel="Annotation editor"
     >
       <div className="flex flex-col gap-3" style={{ marginTop: 8 }}>
-        <h3
-          className="font-serif"
-          style={{ fontSize: 22, fontWeight: 600, color: 'var(--color-text-primary)' }}
-        >
-          {editing ? 'Edit Annotation' : 'New Annotation'}
-        </h3>
-        {state.language === 'zh' && (
-          <p
-            style={{
-              fontSize: 12,
-              color: 'var(--color-muted)',
-              fontFamily: 'var(--font-ui)',
-            }}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <h3
+            className="font-serif"
+            style={{ fontSize: 22, fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}
           >
-            Notes are stored on this device.
-          </p>
-        )}
+            {editing ? 'Edit Annotation' : 'New Annotation'}
+          </h3>
+          {state.language === 'zh' && (
+            <p
+              style={{
+                fontSize: 12,
+                color: 'var(--color-muted)',
+                fontFamily: 'var(--font-ui)',
+                margin: 0,
+              }}
+            >
+              Notes are stored on this device.
+            </p>
+          )}
+        </div>
         {(newSelection?.selectedText || singleAnnotation?.selectedText) && (
           <div
             style={{
@@ -99,47 +125,113 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
               fontFamily: 'var(--font-serif)',
               fontSize: 15,
               color: 'var(--color-text-secondary)',
-              fontStyle: 'italic',
             }}
           >
             "{newSelection?.selectedText || singleAnnotation?.selectedText}"
           </div>
         )}
-        <textarea
-          rows={4}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Enter comment here…"
+        {/* Editor container — toolbar + editable area as one unit */}
+        <div
           style={{
-            width: '100%',
-            padding: '10px 12px',
             border: '1px solid var(--color-border)',
             borderRadius: 'var(--radius-button)',
-            fontFamily: 'var(--font-ui)',
-            fontSize: 14,
-            lineHeight: 1.5,
-            resize: 'vertical',
-            outline: 'none',
-            color: 'var(--color-text-primary)',
+            overflow: 'hidden',
+            transition: 'border-color 0.15s ease',
           }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--color-accent-bright)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--color-border)';
-          }}
-        />
-        {!loggedIn && (
-          <p
+        >
+          {/* Formatting toolbar */}
+          <div
             style={{
-              fontSize: 12,
-              color: 'var(--color-secondary)',
-              fontFamily: 'var(--font-ui)',
+              display: 'flex',
+              gap: 2,
+              padding: '4px 6px',
+              backgroundColor: 'var(--color-surface-low)',
+              borderBottom: '1px solid var(--color-border)',
             }}
           >
-            Log in to save across devices.
-          </p>
-        )}
+            {[
+              { cmd: 'bold', label: 'B', fontWeight: 700 as const, title: 'Bold' },
+              { cmd: 'italic', label: 'I', fontStyle: 'italic' as const, title: 'Italic' },
+              { cmd: 'underline', label: 'U', textDecoration: 'underline' as const, title: 'Underline' },
+            ].map(({ cmd, label, fontWeight, fontStyle: fs, textDecoration, title }) => (
+              <button
+                key={cmd}
+                type="button"
+                title={title}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  applyFormat(cmd);
+                }}
+                onMouseEnter={(e) => {
+                  if (!activeFormats.has(cmd)) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-border)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!activeFormats.has(cmd)) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+                style={{
+                  width: 30,
+                  height: 28,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  borderRadius: 4,
+                  backgroundColor: activeFormats.has(cmd) ? 'var(--color-accent)' : 'transparent',
+                  color: activeFormats.has(cmd) ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 14,
+                  fontWeight: fontWeight || 400,
+                  fontStyle: fs || 'normal',
+                  textDecoration: textDecoration || 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.15s ease, color 0.15s ease',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {/* Rich text editor */}
+          <div
+            ref={editorRef}
+            contentEditable
+            role="textbox"
+            aria-label="Annotation text"
+            data-placeholder="Enter comment here…"
+            onInput={() => {
+              setText(editorRef.current?.innerHTML || '');
+              updateActiveFormats();
+            }}
+            onKeyUp={updateActiveFormats}
+            onMouseUp={updateActiveFormats}
+            onFocus={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (container) container.style.borderColor = 'var(--color-accent-bright)';
+            }}
+            onBlur={(e) => {
+              const container = e.currentTarget.parentElement;
+              if (container) container.style.borderColor = 'var(--color-border)';
+            }}
+            style={{
+              width: '100%',
+              minHeight: 96,
+              padding: '10px 12px',
+              fontFamily: 'var(--font-ui)',
+              fontSize: 14,
+              lineHeight: 1.5,
+              outline: 'none',
+              color: 'var(--color-text-primary)',
+              overflowY: 'auto',
+              maxHeight: 200,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          />
+        </div>
         {existing.length > 0 && (
           <ul
             className="flex flex-col gap-2"
@@ -168,14 +260,14 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
                     color: 'var(--color-text-primary)',
                     flex: 1,
                   }}
-                >
-                  {a.comment}
-                </span>
+                  dangerouslySetInnerHTML={{ __html: a.comment }}
+                />
                 <button
                   type="button"
                   onClick={() => {
                     setEditing(a.id);
                     setText(a.comment);
+                    if (editorRef.current) editorRef.current.innerHTML = a.comment;
                   }}
                   style={{
                     fontSize: 11,
@@ -248,7 +340,7 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
           <button
             type="button"
             onClick={handleSave}
-            disabled={!text.trim()}
+            disabled={!text.trim() || text.trim() === '<br>'}
             style={{
               height: 36,
               padding: '0 16px',
@@ -259,7 +351,7 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
               fontFamily: 'var(--font-ui)',
               fontWeight: 500,
               fontSize: 14,
-              opacity: text.trim() ? 1 : 0.5,
+              opacity: text.trim() && text.trim() !== '<br>' ? 1 : 0.5,
             }}
           >
             Save
