@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Modal } from '../shared/Modal';
 import { useAnnotations } from '../../hooks/useAnnotations';
-import { useAuth } from '../../hooks/useAuth';
 import { useApp } from '../../context/AppContext';
 import type { Annotation } from '../../types';
 
@@ -21,7 +20,6 @@ export interface AnnotationPopoverProps {
 
 export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotationId, newSelection }: AnnotationPopoverProps) {
   const { forSegment, getAnnotationById, save, remove, update } = useAnnotations(chapterId);
-  const { loggedIn } = useAuth();
   const { state, toggleAnnotationMode } = useApp();
   const [text, setText] = useState('');
   const [editing, setEditing] = useState<string | null>(null);

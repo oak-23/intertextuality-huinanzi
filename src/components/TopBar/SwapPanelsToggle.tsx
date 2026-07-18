@@ -13,6 +13,7 @@ export function SwapPanelsToggle({ className }: SwapPanelsToggleProps) {
   return (
     <IconButton
       aria-label="Swap main and parallel panels"
+      title="Swap main and parallel panels"
       aria-pressed={state.panelsSwapped}
       onClick={toggleSwapPanels}
       active={state.panelsSwapped}

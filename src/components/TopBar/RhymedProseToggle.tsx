@@ -31,6 +31,7 @@ export function RhymedProseToggle({ className }: RhymedProseToggleProps) {
       role="switch"
       aria-checked={rhymed}
       aria-label={`Display mode: ${rhymed ? 'rhymed' : 'prose'}. Click to switch.`}
+      title={`Display mode: ${rhymed ? 'Rhymed' : 'Prose'}`}
       onClick={flip}
       className={className}
       style={{

@@ -13,6 +13,7 @@ export function ReportButton({ className }: ReportButtonProps) {
     <>
       <IconButton
         aria-label="Report an issue"
+        title="Report an issue"
         onClick={() => setOpen(true)}
         className={className}
       >

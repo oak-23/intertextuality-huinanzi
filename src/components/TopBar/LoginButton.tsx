@@ -17,7 +17,6 @@ export function LoginButton({ className }: LoginButtonProps) {
         type="button"
         onClick={logout}
         aria-label={`Sign out ${email ?? ''}`}
-        title={`${email}\nClick to sign out`}
         className={`inline-flex items-center justify-center transition-transform hover:scale-105 ${className ?? ''}`}
         style={{
           width: 32,

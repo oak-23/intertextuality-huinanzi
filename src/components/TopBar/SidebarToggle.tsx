@@ -11,6 +11,7 @@ export function SidebarToggle({ className }: SidebarToggleProps) {
   return (
     <IconButton
       aria-label={state.sidebarOpen ? 'Close parallel-texts sidebar' : 'Open parallel-texts sidebar'}
+      title={state.sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
       aria-pressed={state.sidebarOpen}
       active={state.sidebarOpen}
       onClick={toggleSidebar}
