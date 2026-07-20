@@ -14,6 +14,7 @@ export interface UseAnnotationsReturn {
     endIndex?: number;
     language?: "zh" | "en";
     selectedText?: string;
+    rhymed?: boolean;
   }) => void;
   remove: (annotationId: string) => void;
   update: (annotationId: string, comment: string) => void;
@@ -57,6 +58,7 @@ export function useAnnotations(chapterId: string): UseAnnotationsReturn {
       endIndex,
       language,
       selectedText,
+      rhymed,
     }: {
       segmentId?: string;
       comment: string;
@@ -64,6 +66,7 @@ export function useAnnotations(chapterId: string): UseAnnotationsReturn {
       endIndex?: number;
       language?: "zh" | "en";
       selectedText?: string;
+      rhymed?: boolean;
     }) => {
       const annotation: Annotation = {
         id: `ann-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -74,6 +77,7 @@ export function useAnnotations(chapterId: string): UseAnnotationsReturn {
         endIndex,
         language,
         selectedText,
+        rhymed,
         createdAt: new Date().toISOString(),
       };
       repo.saveAnnotation(annotation);

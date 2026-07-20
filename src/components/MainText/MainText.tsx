@@ -10,7 +10,10 @@ import { MultiParallelPopover } from "./MultiParallelPopover";
 import { splitIntoSpans, type TextSpan } from "./spans";
 import { chapterOrdinal, formatTitleEn } from "../../utils/titles";
 import { withinLengthRange } from "../../utils/parallelFilters";
-import { normalizeCitationKey, citationZhByKey } from "../../data/citationTitles";
+import {
+  normalizeCitationKey,
+  citationZhByKey,
+} from "../../data/citationTitles";
 import type { InlineParallel, ParallelOption, RhymedLine } from "../../types";
 
 export interface MainTextProps {
@@ -65,20 +68,48 @@ export function MainText({ className }: MainTextProps) {
   const [multiParallels, setMultiParallels] = useState<ParallelOption[]>([]);
 
   const [annotationOpen, setAnnotationOpen] = useState(false);
-  const [annotationSegmentId, setAnnotationSegmentId] = useState<string | null>(null);
+  const [annotationSegmentId, setAnnotationSegmentId] = useState<string | null>(
+    null,
+  );
   const [annotationId, setAnnotationId] = useState<string | null>(null);
   const [newSelection, setNewSelection] = useState<{
     startIndex: number;
     endIndex: number;
     language: "zh" | "en";
     selectedText: string;
+    rhymed?: boolean;
   } | null>(null);
   const [hoveredAnnotation, setHoveredAnnotation] = useState<{
     anchor: HTMLElement;
     comment: string;
   } | null>(null);
 
-  const { countForSegment, annotations } = useAnnotations(state.activeChapterId);
+  const { countForSegment, annotations } = useAnnotations(
+    state.activeChapterId,
+  );
+
+  const annotationParallels = useMemo<InlineParallel[]>(() => {
+    const hidden = new Set(state.hiddenTexts);
+    if (hidden.has("annotation")) return [];
+
+    return annotations
+      .filter(
+        (a) =>
+          a.language === state.language &&
+          a.startIndex !== undefined &&
+          a.endIndex !== undefined,
+      )
+      .map((a) => ({
+        startZh: a.language === "zh" ? a.startIndex! : -1,
+        endZh: a.language === "zh" ? a.endIndex! : -1,
+        startEn: a.language === "en" ? a.startIndex! : -1,
+        endEn: a.language === "en" ? a.endIndex! : -1,
+        textId: "annotation",
+        chapterId: a.chapterId,
+        segmentId: a.id,
+        colorKey: "annotation",
+      }));
+  }, [annotations, state.hiddenTexts, state.language]);
 
   const continuousText = texts.getMainContinuousText();
   const chapter =
@@ -98,19 +129,11 @@ export function MainText({ className }: MainTextProps) {
     const visible = chapter.inlineParallels.filter(
       (p) => !hidden.has(p.textId) && withinLengthRange(p, lo, hi),
     );
-    const annotationParallels: InlineParallel[] = (hidden.has('annotation') ? [] : annotations)
-      .filter(a => a.language === state.language && a.startIndex !== undefined && a.endIndex !== undefined)
-      .map(a => ({
-        startZh: a.language === 'zh' ? a.startIndex! : -1,
-        endZh: a.language === 'zh' ? a.endIndex! : -1,
-        startEn: a.language === 'en' ? a.startIndex! : -1,
-        endEn: a.language === 'en' ? a.endIndex! : -1,
-        textId: 'annotation',
-        chapterId: a.chapterId,
-        segmentId: a.id,
-        colorKey: 'annotation',
-      }));
-    return splitIntoSpans(fullText, [...visible, ...annotationParallels], state.language);
+    return splitIntoSpans(
+      fullText,
+      [...visible, ...annotationParallels],
+      state.language,
+    );
   }, [
     chapter,
     rhymedActive,
@@ -127,12 +150,15 @@ export function MainText({ className }: MainTextProps) {
     const hidden = new Set(state.hiddenTexts);
     const lo = state.lengthMin;
     const hi = state.lengthMax;
-    const visible = rhymed.inlineParallels.filter(
-      (p) =>
-        p.startZh >= 0 &&
-        !hidden.has(p.textId) &&
-        withinLengthRange(p, lo, hi),
-    );
+    const visible = [
+      ...rhymed.inlineParallels.filter(
+        (p) =>
+          p.startZh >= 0 &&
+          !hidden.has(p.textId) &&
+          withinLengthRange(p, lo, hi),
+      ),
+      ...annotationParallels,
+    ];
     const rows: { line: RhymedLine; spans: TextSpan[] }[] = [];
     let offset = 0;
     for (const line of rhymed.lines) {
@@ -147,7 +173,14 @@ export function MainText({ className }: MainTextProps) {
           // Show footnote only on the line where the parallel ends
           footnote: p.endZh <= end ? p.footnote : undefined,
         }));
-      rows.push({ line, spans: splitIntoSpans(line.zh, clipped, "zh") });
+      rows.push({
+        line,
+        spans: splitIntoSpans(line.zh, clipped, "zh").map((span) => ({
+          ...span,
+          start: span.start + start,
+          end: span.end + start,
+        })),
+      });
       offset = end + 1; // the \n separator
     }
     return rows;
@@ -165,7 +198,7 @@ export function MainText({ className }: MainTextProps) {
     (parallels: InlineParallel[], anchor: HTMLElement) => {
       if (parallels.length === 0) return;
 
-      if (parallels.length === 1 && parallels[0].colorKey === 'annotation') {
+      if (parallels.length === 1 && parallels[0].colorKey === "annotation") {
         setAnnotationId(parallels[0].segmentId);
         setAnnotationOpen(true);
         return;
@@ -228,9 +261,6 @@ export function MainText({ className }: MainTextProps) {
 
   const handleMouseUp = useCallback(() => {
     if (!state.annotationMode) return;
-    // Rhymed spans carry line-relative offsets; selection anchoring is
-    // prose-only until offsets are mapped through the line grid.
-    if (rhymedActive) return;
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed) return;
 
@@ -248,10 +278,25 @@ export function MainText({ className }: MainTextProps) {
       while (current && current.nodeType !== Node.ELEMENT_NODE) {
         current = current.parentNode;
       }
-      const el = (current as HTMLElement)?.closest('[data-offset-start]');
+      const el = (current as HTMLElement)?.closest("[data-offset-start]");
       if (el) {
-        const start = parseInt(el.getAttribute('data-offset-start') || '0', 10);
-        return start + offsetInNode;
+        const start = parseInt(el.getAttribute("data-offset-start") || "0", 10);
+        let textOffset = 0;
+        const walker = document.createTreeWalker(
+          el,
+          NodeFilter.SHOW_TEXT,
+          null,
+        );
+        let n = walker.nextNode();
+        while (n) {
+          if (n === node) {
+            textOffset += offsetInNode;
+            break;
+          }
+          textOffset += n.textContent?.length || 0;
+          n = walker.nextNode();
+        }
+        return start + textOffset;
       }
       return -1;
     };
@@ -265,6 +310,7 @@ export function MainText({ className }: MainTextProps) {
         endIndex: endIdx,
         language: state.language,
         selectedText: text,
+        rhymed: rhymedActive,
       });
       setAnnotationOpen(true);
       selection.removeAllRanges();
@@ -296,29 +342,71 @@ export function MainText({ className }: MainTextProps) {
         ? localizeParallelTitles(text)
         : text;
 
-  /** Render one text span (plain, single-parallel, or multi-parallel).
-   *  Pass isProseZh=true only from the prose (non-rhymed) zh render path to
-   *  enable citation localization; rhymed lines and the 'en' path must not pass it. */
   const renderSpan = (span: TextSpan, i: number, isProseZh = false) => {
     if (span.parallels.length === 0) {
-      return <span key={i} data-offset-start={span.start}>{plainDisplayText(span.text, isProseZh)}</span>;
+      return (
+        <span key={i} data-offset-start={span.start}>
+          {plainDisplayText(span.text, isProseZh)}
+        </span>
+      );
     }
 
-    if (span.parallels.length === 1) {
-      const isAnnotation = span.parallels[0].colorKey === 'annotation';
-      const annotationComment = isAnnotation ? annotations.find(a => a.id === span.parallels[0].segmentId)?.comment : undefined;
+    const realParallels = span.parallels.filter(
+      (p) => p.colorKey !== "annotation",
+    );
+    const annParallels = span.parallels.filter(
+      (p) => p.colorKey === "annotation",
+    );
+
+    const hasAnnotation = annParallels.length > 0;
+    const annBorder = hasAnnotation ? "2px dashed var(--color-accent)" : "none";
+    const firstAnn = annParallels[0];
+    const annotationComment = firstAnn
+      ? annotations.find((a) => a.id === firstAnn.segmentId)?.comment
+      : undefined;
+
+    const handleSpanClick = (e: React.MouseEvent<HTMLElement>) => {
+      if (state.annotationMode) {
+        if (hasAnnotation) {
+          setAnnotationId(firstAnn.segmentId);
+          setAnnotationOpen(true);
+        } else if (realParallels.length > 0) {
+          setAnnotationSegmentId(realParallels[0].segmentId);
+          setAnnotationOpen(true);
+        }
+        return;
+      }
+
+      if (realParallels.length === 0) {
+        if (hasAnnotation) {
+          setAnnotationId(firstAnn.segmentId);
+          setAnnotationOpen(true);
+        }
+      } else {
+        handleHighlightClick(realParallels, e.currentTarget);
+      }
+    };
+
+    if (realParallels.length <= 1) {
+      const real = realParallels[0];
+      const bg = real
+        ? `var(--color-highlight-${real.colorKey})`
+        : "transparent";
+
       return (
         <span
           key={i}
           data-offset-start={span.start}
-          data-parallel-ids={span.parallels[0].segmentId}
+          data-parallel-ids={span.parallels.map((p) => p.segmentId).join(" ")}
           className="scroll-anchor"
-          onClick={(e) => handleHighlightClick(span.parallels, e.currentTarget)}
+          onClick={handleSpanClick}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.filter =
-              "brightness(0.97)";
+            (e.currentTarget as HTMLElement).style.filter = "brightness(0.97)";
             if (annotationComment) {
-              setHoveredAnnotation({ anchor: e.currentTarget, comment: annotationComment });
+              setHoveredAnnotation({
+                anchor: e.currentTarget,
+                comment: annotationComment,
+              });
             }
           }}
           onMouseLeave={(e) => {
@@ -328,9 +416,9 @@ export function MainText({ className }: MainTextProps) {
             }
           }}
           style={{
-            background: isAnnotation ? 'transparent' : `var(--color-highlight-${span.parallels[0].colorKey})`,
+            background: bg,
             padding: "2px 4px",
-            borderBottom: isAnnotation ? '2px dashed var(--color-accent)' : 'none',
+            borderBottom: annBorder,
             borderRadius: "var(--radius-sm)",
             cursor: "pointer",
             transition: "filter 150ms ease, box-shadow 150ms ease",
@@ -343,16 +431,14 @@ export function MainText({ className }: MainTextProps) {
     }
 
     const chars = Array.from(span.text);
-    const n = span.parallels.length;
+    const n = realParallels.length;
     const chunks = [];
     for (let j = 0; j < n; j++) {
-      // Even partition so every parallel gets a slice (and its color) when
-      // the span has at least as many characters as parallels.
       const start = Math.round((j * chars.length) / n);
       const end = Math.round(((j + 1) * chars.length) / n);
       const text = chars.slice(start, end).join("");
       if (text) {
-        chunks.push({ text, parallel: span.parallels[j] });
+        chunks.push({ text, parallel: realParallels[j] });
       }
     }
 
@@ -364,32 +450,32 @@ export function MainText({ className }: MainTextProps) {
         className="scroll-anchor"
         style={{
           display: "inline",
+          borderBottom: annBorder,
         }}
       >
-          {chunks.map((chunk, j) => {
-            const isAnnotationChunk = chunk.parallel.colorKey === 'annotation';
-            const chunkComment = isAnnotationChunk ? annotations.find(a => a.id === chunk.parallel.segmentId)?.comment : undefined;
-            return (
+        {chunks.map((chunk, j) => {
+          return (
             <span
               key={j}
-              onClick={(e) =>
-                handleHighlightClick(span.parallels, e.currentTarget)
-              }
+              onClick={handleSpanClick}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.filter =
                   "brightness(0.97)";
-                if (chunkComment) {
-                  setHoveredAnnotation({ anchor: e.currentTarget, comment: chunkComment });
+                if (annotationComment) {
+                  setHoveredAnnotation({
+                    anchor: e.currentTarget,
+                    comment: annotationComment,
+                  });
                 }
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLElement).style.filter = "";
-                if (chunkComment) {
+                if (annotationComment) {
                   setHoveredAnnotation(null);
                 }
               }}
               style={{
-                background: chunk.parallel.colorKey === 'annotation' ? 'transparent' : `var(--color-highlight-${chunk.parallel.colorKey})`,
+                background: `var(--color-highlight-${chunk.parallel.colorKey})`,
                 paddingTop: 2,
                 paddingBottom: 2,
                 paddingLeft: j === 0 ? 4 : 0,
@@ -408,7 +494,8 @@ export function MainText({ className }: MainTextProps) {
             >
               {chunk.text}
             </span>
-          )})}
+          );
+        })}
       </span>
     );
   };
@@ -506,21 +593,21 @@ export function MainText({ className }: MainTextProps) {
           // Breathing room between a 。？！-final highlight and its citation
           // bracket (those highlights end flush against the bracket).
           const gap = /[。？！]$/.test(span.text) && /^[《（]/.test(m[0]);
+          out.push(...badges);
           out.push(
             <span key={`cit-${i}`} style={gap ? { marginLeft: 8 } : undefined}>
               {m[0]}
             </span>,
             sup,
           );
-          out.push(...badges);
           const rest = display.slice(m[0].length);
           if (rest) out.push(<span key={`rest-${i}`}>{rest}</span>);
           i++; // next span consumed
           continue;
         }
       }
-      out.push(sup);
       out.push(...badges);
+      out.push(sup);
     }
     return out;
   };
@@ -706,7 +793,8 @@ export function MainText({ className }: MainTextProps) {
             boxShadow: "var(--shadow-popover)",
           }}
         >
-          Annotation mode — select text or click a highlighted parallel to add a note.
+          Annotation mode — select text or click a highlighted parallel to add a
+          note.
         </div>
       )}
       <AnnotationPopover
@@ -751,33 +839,38 @@ export function MainText({ className }: MainTextProps) {
         }}
         onClose={() => setMultiAnchor(null)}
       />
-      {hoveredAnnotation && (() => {
-        const rect = hoveredAnnotation.anchor.getBoundingClientRect();
-        return (
-          <div
-            style={{
-              position: 'fixed',
-              top: rect.top + rect.height / 2,
-              left: 'calc(var(--sidebar-width) + 12px)',
-              transform: 'translateY(-50%)',
-              maxWidth: 220,
-              padding: '8px 12px',
-              backgroundColor: 'var(--color-background)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-popover)',
-              boxShadow: 'var(--shadow-popover)',
-              fontSize: 13,
-              fontFamily: 'var(--font-ui)',
-              color: 'var(--color-text-primary)',
-              wordWrap: 'break-word',
-              pointerEvents: 'none',
-              zIndex: 80,
-            }}
-          >
-            <span dangerouslySetInnerHTML={{ __html: hoveredAnnotation.comment || '' }} />
-          </div>
-        );
-      })()}
+      {hoveredAnnotation &&
+        (() => {
+          const rect = hoveredAnnotation.anchor.getBoundingClientRect();
+          return (
+            <div
+              style={{
+                position: "fixed",
+                top: rect.top + rect.height / 2,
+                left: "calc(var(--sidebar-width) + 12px)",
+                transform: "translateY(-50%)",
+                maxWidth: 220,
+                padding: "8px 12px",
+                backgroundColor: "var(--color-background)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-popover)",
+                boxShadow: "var(--shadow-popover)",
+                fontSize: 13,
+                fontFamily: "var(--font-ui)",
+                color: "var(--color-text-primary)",
+                wordWrap: "break-word",
+                pointerEvents: "none",
+                zIndex: 80,
+              }}
+            >
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: hoveredAnnotation.comment || "",
+                }}
+              />
+            </div>
+          );
+        })()}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export interface AnnotationPopoverProps {
     endIndex: number;
     language: "zh" | "en";
     selectedText: string;
+    rhymed?: boolean;
   } | null;
 }
 
@@ -71,6 +72,7 @@ export function AnnotationPopover({ open, onClose, chapterId, segmentId, annotat
         endIndex: newSelection.endIndex,
         language: newSelection.language,
         selectedText: newSelection.selectedText,
+        rhymed: newSelection.rhymed,
       });
     } else if (segmentId) {
       save({ segmentId, comment: value });

@@ -73,42 +73,42 @@ export function ChapterSelector({ className }: ChapterSelectorProps) {
             Chapters
           </div>
           <div style={{ padding: '6px 12px 8px' }}>
-              <div className="relative">
-                <span
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                  style={{ color: 'var(--color-secondary)' }}
-                >
-                  <Search size={14} />
-                </span>
-                <input
-                  ref={searchRef}
-                  type="text"
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  placeholder="Search chapters…"
-                  aria-label="Filter chapters"
-                  style={{
-                    width: '100%',
-                    height: 32,
-                    paddingLeft: 30,
-                    paddingRight: 10,
-                    backgroundColor: 'var(--color-surface-low)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-button)',
-                    fontFamily: 'var(--font-ui)',
-                    fontSize: 13,
-                    color: 'var(--color-text-primary)',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-accent-bright)';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-border)';
-                  }}
-                />
-              </div>
+            <div className="relative">
+              <span
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: 'var(--color-secondary)' }}
+              >
+                <Search size={14} />
+              </span>
+              <input
+                ref={searchRef}
+                type="text"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Search chapters…"
+                aria-label="Filter chapters"
+                style={{
+                  width: '100%',
+                  height: 32,
+                  paddingLeft: 30,
+                  paddingRight: 10,
+                  backgroundColor: 'var(--color-surface-low)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-button)',
+                  fontFamily: 'var(--font-ui)',
+                  fontSize: 13,
+                  color: 'var(--color-text-primary)',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-accent-bright)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border)';
+                }}
+              />
             </div>
+          </div>
           <div role="listbox" style={{ flex: 1, overflowY: 'auto' }}>
             {filtered.length === 0 ? (
               <div

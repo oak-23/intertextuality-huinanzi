@@ -141,6 +141,7 @@ export interface Annotation {
   endIndex?: number;
   language?: "zh" | "en";
   selectedText?: string;
+  rhymed?: boolean;
 }
 
 export interface SearchResult {
